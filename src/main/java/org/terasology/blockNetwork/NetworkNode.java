@@ -1,8 +1,7 @@
 package org.terasology.blockNetwork;
 
-import org.terasology.math.Direction;
 import org.terasology.math.Side;
-import org.terasology.math.Sides;
+import org.terasology.math.SideBitFlag;
 import org.terasology.math.Vector3i;
 
 /**
@@ -18,7 +17,7 @@ public class NetworkNode {
     }
 
     public NetworkNode(Vector3i location, Side... sides) {
-        this(location, Sides.getSides(sides));
+        this(location, SideBitFlag.getSides(sides));
     }
 
     @Override

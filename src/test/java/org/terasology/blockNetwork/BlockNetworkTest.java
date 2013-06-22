@@ -2,9 +2,7 @@ package org.terasology.blockNetwork;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.terasology.math.Direction;
 import org.terasology.math.Side;
-import org.terasology.math.Sides;
 import org.terasology.math.Vector3i;
 
 import java.util.Set;

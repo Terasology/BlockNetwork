@@ -1,12 +1,10 @@
 package org.terasology.blockNetwork;
 
-import org.terasology.math.Direction;
-
 import java.util.*;
 
 import com.google.common.collect.*;
 import org.terasology.math.Side;
-import org.terasology.math.Sides;
+import org.terasology.math.SideBitFlag;
 
 /**
  * Represents one network of nodes, where each nodes is somehow connected to another within the network.
@@ -120,9 +118,9 @@ public class SimpleNetwork implements Network {
     }
 
     public static boolean areNodesConnecting(NetworkNode node1, NetworkNode node2) {
-        for (Side side : Sides.getSides(node1.connectionSides)) {
+        for (Side side : SideBitFlag.getSides(node1.connectionSides)) {
             final ImmutableBlockLocation possibleConnectedLocation = node1.location.move(side);
-            if (node2.location.equals(possibleConnectedLocation) && Sides.hasSide(node2.connectionSides, side.reverse()))
+            if (node2.location.equals(possibleConnectedLocation) && SideBitFlag.hasSide(node2.connectionSides, side.reverse()))
                 return true;
         }
         return false;
@@ -152,10 +150,10 @@ public class SimpleNetwork implements Network {
     }
 
     private boolean canConnectToNetworkingNode(NetworkNode networkNode) {
-        for (Side connectingOnSide : Sides.getSides(networkNode.connectionSides)) {
+        for (Side connectingOnSide : SideBitFlag.getSides(networkNode.connectionSides)) {
             final ImmutableBlockLocation possibleConnectionLocation = networkNode.location.move(connectingOnSide);
             for (NetworkNode possibleConnectedNode : networkingNodes.get(possibleConnectionLocation)) {
-                if (Sides.hasSide(possibleConnectedNode.connectionSides, connectingOnSide.reverse()))
+                if (SideBitFlag.hasSide(possibleConnectedNode.connectionSides, connectingOnSide.reverse()))
                     return true;
             }
         }
@@ -288,10 +286,10 @@ public class SimpleNetwork implements Network {
 //    }
 
     private void listConnectedNotVisitedNetworkingNodes(Set<NetworkNode> visitedNodes, NetworkNode location, Collection<NetworkNode> result) {
-        for (Side connectingOnSide : Sides.getSides(location.connectionSides)) {
+        for (Side connectingOnSide : SideBitFlag.getSides(location.connectionSides)) {
             final ImmutableBlockLocation possibleConnectionLocation = location.location.move(connectingOnSide);
             for (NetworkNode possibleConnection : networkingNodes.get(possibleConnectionLocation)) {
-                if (!visitedNodes.contains(possibleConnection) && Sides.hasSide(possibleConnection.connectionSides, connectingOnSide.reverse()))
+                if (!visitedNodes.contains(possibleConnection) && SideBitFlag.hasSide(possibleConnection.connectionSides, connectingOnSide.reverse()))
                     result.add(possibleConnection);
             }
         }

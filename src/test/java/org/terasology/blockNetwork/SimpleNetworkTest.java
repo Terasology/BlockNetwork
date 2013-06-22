@@ -2,9 +2,8 @@ package org.terasology.blockNetwork;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.terasology.math.Direction;
 import org.terasology.math.Side;
-import org.terasology.math.Sides;
+import org.terasology.math.SideBitFlag;
 import org.terasology.math.Vector3i;
 
 import static org.junit.Assert.*;
@@ -18,7 +17,7 @@ public class SimpleNetworkTest {
     public void setup() {
         network = new SimpleNetwork();
         allDirections = 63;
-        upOnly = Sides.addSide((byte) 0, Side.TOP);
+        upOnly = SideBitFlag.addSide((byte) 0, Side.TOP);
     }
 
     private NetworkNode toNode(Vector3i location, byte sides) {
