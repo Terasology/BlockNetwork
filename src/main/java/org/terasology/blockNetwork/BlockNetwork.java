@@ -304,6 +304,10 @@ public class BlockNetwork {
         return null;
     }
 
+    public Network getNetworkWithNetworkingBlock(NetworkNode networkNode) {
+        return findNetworkWithNetworkingBlock(networkNode);
+    }
+
     private void notifyNetworkAdded(SimpleNetwork network) {
         for (NetworkTopologyListener listener : listeners)
             listener.networkAdded(network);
