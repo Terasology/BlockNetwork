@@ -296,7 +296,7 @@ public class BlockNetwork {
         return networks.contains(network);
     }
 
-    private SimpleNetwork findNetworkWithNetworkingBlock(NetworkNode networkNode) {
+    public SimpleNetwork findNetworkWithNetworkingBlock(NetworkNode networkNode) {
         for (SimpleNetwork network : networks) {
             if (network.hasNetworkingNode(networkNode))
                 return network;
