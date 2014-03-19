@@ -113,10 +113,12 @@ public class SimpleNetwork implements Network {
         distanceCache.clear();
     }
 
+    @Override
     public Collection<NetworkNode> getNetworkingNodes() {
         return Collections.unmodifiableCollection(networkingNodes.values());
     }
 
+    @Override
     public Collection<NetworkNode> getLeafNodes() {
         return Collections.unmodifiableCollection(leafNodes.values());
     }
