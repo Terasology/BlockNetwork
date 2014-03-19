@@ -296,12 +296,16 @@ public class BlockNetwork {
         return networks.contains(network);
     }
 
-    public SimpleNetwork findNetworkWithNetworkingBlock(NetworkNode networkNode) {
+    private SimpleNetwork findNetworkWithNetworkingBlock(NetworkNode networkNode) {
         for (SimpleNetwork network : networks) {
             if (network.hasNetworkingNode(networkNode))
                 return network;
         }
         return null;
+    }
+
+    public Network getNetworkWithNetworkingBlock(NetworkNode networkNode) {
+        return findNetworkWithNetworkingBlock(networkNode);
     }
 
     private void notifyNetworkAdded(SimpleNetwork network) {
