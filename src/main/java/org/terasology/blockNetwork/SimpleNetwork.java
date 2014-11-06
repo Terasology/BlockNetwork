@@ -1,8 +1,17 @@
 package org.terasology.blockNetwork;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import com.google.common.collect.*;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Maps;
+import com.google.common.collect.SetMultimap;
+import com.google.common.collect.Sets;
 import org.terasology.math.Side;
 import org.terasology.math.SideBitFlag;
 import org.terasology.math.Vector3i;
@@ -30,12 +39,14 @@ public class SimpleNetwork implements Network {
 
     // Distance cache
     private Map<TwoNetworkNodes, Integer> distanceCache = Maps.newHashMap();
+    private Map<TwoNetworkNodes, List<NetworkNode>> shortestRouteCache = Maps.newHashMap();
 
     public static SimpleNetwork createDegenerateNetwork(
             NetworkNode networkNode1,
             NetworkNode networkNode2) {
-        if (!areNodesConnecting(networkNode1, networkNode2))
+        if (!areNodesConnecting(networkNode1, networkNode2)) {
             throw new IllegalArgumentException("These two nodes are not connected");
+        }
 
         SimpleNetwork network = new SimpleNetwork();
         network.leafNodes.put(networkNode1.location, networkNode1);
@@ -49,10 +60,12 @@ public class SimpleNetwork implements Network {
      * @param networkNode Definition of the networking node position and connecting sides.
      */
     public void addNetworkingNode(NetworkNode networkNode) {
-        if (SANITY_CHECK && !canAddNetworkingNode(networkNode))
+        if (SANITY_CHECK && !canAddNetworkingNode(networkNode)) {
             throw new IllegalStateException("Unable to add this node to network");
+        }
         networkingNodes.put(networkNode.location, networkNode);
         distanceCache.clear();
+        shortestRouteCache.clear();
     }
 
     /**
@@ -61,10 +74,12 @@ public class SimpleNetwork implements Network {
      * @param networkNode Definition of the leaf node position and connecting sides.
      */
     public void addLeafNode(NetworkNode networkNode) {
-        if (SANITY_CHECK && (!canAddLeafNode(networkNode) || isEmptyNetwork()))
+        if (SANITY_CHECK && (!canAddLeafNode(networkNode) || isEmptyNetwork())) {
             throw new IllegalStateException("Unable to add this node to network");
+        }
         leafNodes.put(networkNode.location, networkNode);
         distanceCache.clear();
+        shortestRouteCache.clear();
     }
 
     /**
@@ -81,7 +96,7 @@ public class SimpleNetwork implements Network {
     /**
      * Removes a leaf node from the network. If this removal made the network degenerate, it will return <code>true</code>.
      *
-     * @param networkingNode  Definition of the leaf node position and connecting sides.
+     * @param networkingNode Definition of the leaf node position and connecting sides.
      * @return <code>true</code> if the network after the removal is degenerated or empty (no longer valid).
      */
     public boolean removeLeafNode(NetworkNode networkingNode) {
@@ -89,10 +104,12 @@ public class SimpleNetwork implements Network {
         // We just need to check, if after removal of the node, network becomes degenerated, if so - we need
         // to signal that the network is no longer valid and should be removed.
         final boolean changed = leafNodes.remove(networkingNode.location, networkingNode);
-        if (!changed)
+        if (!changed) {
             throw new IllegalStateException("Tried to remove a node that is not in the network");
+        }
 
         distanceCache.clear();
+        shortestRouteCache.clear();
 
         return isDegeneratedNetwork() || isEmptyNetwork();
     }
@@ -100,17 +117,21 @@ public class SimpleNetwork implements Network {
     public void removeAllLeafNodes() {
         leafNodes.clear();
         distanceCache.clear();
+        shortestRouteCache.clear();
     }
 
     public void removeAllNetworkingNodes() {
         networkingNodes.clear();
         distanceCache.clear();
+        shortestRouteCache.clear();
     }
 
     public void removeNetworkingNode(NetworkNode networkNode) {
-        if (!networkingNodes.remove(networkNode.location, networkNode))
+        if (!networkingNodes.remove(networkNode.location, networkNode)) {
             throw new IllegalStateException("Tried to remove a node that is not in the network");
+        }
         distanceCache.clear();
+        shortestRouteCache.clear();
     }
 
     @Override
@@ -126,8 +147,9 @@ public class SimpleNetwork implements Network {
     public static boolean areNodesConnecting(NetworkNode node1, NetworkNode node2) {
         for (Side side : SideBitFlag.getSides(node1.connectionSides)) {
             final ImmutableBlockLocation possibleConnectedLocation = node1.location.move(side);
-            if (node2.location.equals(possibleConnectedLocation) && SideBitFlag.hasSide(node2.connectionSides, side.reverse()))
+            if (node2.location.equals(possibleConnectedLocation) && SideBitFlag.hasSide(node2.connectionSides, side.reverse())) {
                 return true;
+            }
         }
         return false;
     }
@@ -139,18 +161,22 @@ public class SimpleNetwork implements Network {
      * @return If the networking node can be added to the network (connects to it).
      */
     public boolean canAddNetworkingNode(NetworkNode networkNode) {
-        if (isEmptyNetwork())
+        if (isEmptyNetwork()) {
             return true;
-        if (networkingNodes.containsValue(networkNode) || leafNodes.containsValue(networkNode))
+        }
+        if (networkingNodes.containsValue(networkNode) || leafNodes.containsValue(networkNode)) {
             return false;
+        }
         return canConnectToNetworkingNode(networkNode);
     }
 
     public boolean canAddLeafNode(NetworkNode networkNode) {
-        if (isEmptyNetwork())
+        if (isEmptyNetwork()) {
             return false;
-        if (networkingNodes.containsValue(networkNode) || leafNodes.containsValue(networkNode))
+        }
+        if (networkingNodes.containsValue(networkNode) || leafNodes.containsValue(networkNode)) {
             return false;
+        }
 
         return canConnectToNetworkingNode(networkNode);
     }
@@ -159,8 +185,9 @@ public class SimpleNetwork implements Network {
         for (Side connectingOnSide : SideBitFlag.getSides(networkNode.connectionSides)) {
             final ImmutableBlockLocation possibleConnectionLocation = networkNode.location.move(connectingOnSide);
             for (NetworkNode possibleConnectedNode : networkingNodes.get(possibleConnectionLocation)) {
-                if (SideBitFlag.hasSide(possibleConnectedNode.connectionSides, connectingOnSide.reverse()))
+                if (SideBitFlag.hasSide(possibleConnectedNode.connectionSides, connectingOnSide.reverse())) {
                     return true;
+                }
             }
         }
         return false;
@@ -180,18 +207,22 @@ public class SimpleNetwork implements Network {
     public int getDistance(NetworkNode from, NetworkNode to) {
         TwoNetworkNodes nodePair = new TwoNetworkNodes(from, to);
         final Integer cachedDistance = distanceCache.get(nodePair);
-        if (cachedDistance != null)
+        if (cachedDistance != null) {
             return cachedDistance;
+        }
 
         if ((!hasNetworkingNode(from) && !hasLeafNode(from))
-                || (!hasNetworkingNode(to) && !hasLeafNode(to)))
+                || (!hasNetworkingNode(to) && !hasLeafNode(to))) {
             throw new IllegalArgumentException("Cannot test nodes not in network");
+        }
 
-        if (from.equals(to))
+        if (from.equals(to)) {
             return 0;
+        }
 
-        if (SimpleNetwork.areNodesConnecting(from, to))
+        if (SimpleNetwork.areNodesConnecting(from, to)) {
             return 1;
+        }
 
         // Breadth-first search of the network
         Set<NetworkNode> visitedNodes = Sets.newHashSet();
@@ -200,7 +231,7 @@ public class SimpleNetwork implements Network {
         Set<NetworkNode> networkingNodesToTest = Sets.newHashSet();
         listConnectedNotVisitedNetworkingNodes(visitedNodes, from, networkingNodesToTest);
         int distanceSearched = 1;
-        while (networkingNodesToTest.size()>0) {
+        while (networkingNodesToTest.size() > 0) {
             distanceSearched++;
 
             for (NetworkNode nodeToTest : networkingNodesToTest) {
@@ -214,8 +245,9 @@ public class SimpleNetwork implements Network {
             }
 
             Set<NetworkNode> nextNetworkingNodesToTest = Sets.newHashSet();
-            for (NetworkNode nodeToTest : networkingNodesToTest)
+            for (NetworkNode nodeToTest : networkingNodesToTest) {
                 listConnectedNotVisitedNetworkingNodes(visitedNodes, nodeToTest, nextNetworkingNodesToTest);
+            }
 
             networkingNodesToTest = nextNetworkingNodesToTest;
         }
@@ -223,31 +255,88 @@ public class SimpleNetwork implements Network {
     }
 
     @Override
+    public List<NetworkNode> findShortestRoute(NetworkNode from, NetworkNode to) {
+        TwoNetworkNodes nodePair = new TwoNetworkNodes(from, to);
+        final List<NetworkNode> cachedRoute = shortestRouteCache.get(nodePair);
+        if (cachedRoute != null) {
+            return Collections.unmodifiableList(cachedRoute);
+        }
+
+        if ((!hasNetworkingNode(from) && !hasLeafNode(from))
+                || (!hasNetworkingNode(to) && !hasLeafNode(to))) {
+            throw new IllegalArgumentException("Cannot test nodes not in network");
+        }
+
+        if (from.equals(to)) {
+            return Arrays.asList(from);
+        }
+
+        if (SimpleNetwork.areNodesConnecting(from, to)) {
+            return Arrays.asList(from, to);
+        }
+
+        // Breadth-first search of the network
+        Map<NetworkNode, List<NetworkNode>> visitedNodes = Maps.newHashMap();
+        visitedNodes.put(from, Arrays.asList(from));
+
+        Map<NetworkNode, List<NetworkNode>> networkingNodesToTest = Maps.newHashMap();
+        listConnectedNotVisitedNetworkingNodes(visitedNodes, from, networkingNodesToTest);
+        while (networkingNodesToTest.size() > 0) {
+            for (Map.Entry<NetworkNode, List<NetworkNode>> nodeToTest : networkingNodesToTest.entrySet()) {
+                if (SimpleNetwork.areNodesConnecting(nodeToTest.getKey(), to)) {
+                    List<NetworkNode> route = new LinkedList<>(nodeToTest.getValue());
+                    route.add(to);
+
+                    shortestRouteCache.put(
+                            new TwoNetworkNodes(from, to),
+                            route);
+                    return Collections.unmodifiableList(route);
+                }
+                visitedNodes.put(nodeToTest.getKey(), nodeToTest.getValue());
+            }
+
+            Map<NetworkNode, List<NetworkNode>> nextNetworkingNodesToTest = Maps.newHashMap();
+            for (Map.Entry<NetworkNode, List<NetworkNode>> nodeToTest : networkingNodesToTest.entrySet()) {
+                listConnectedNotVisitedNetworkingNodes(visitedNodes, nodeToTest.getKey(), nextNetworkingNodesToTest);
+            }
+
+            networkingNodesToTest = nextNetworkingNodesToTest;
+        }
+        return null;
+    }
+
+    @Override
     public boolean isInDistance(int distance, NetworkNode from, NetworkNode to) {
-        if (distance < 0)
+        if (distance < 0) {
             throw new IllegalArgumentException("distance must be >= 0");
+        }
 
         TwoNetworkNodes nodePair = new TwoNetworkNodes(from, to);
         final Integer cachedDistance = distanceCache.get(nodePair);
-        if (cachedDistance != null)
-            return cachedDistance<=distance;
+        if (cachedDistance != null) {
+            return cachedDistance <= distance;
+        }
 
         if ((!hasNetworkingNode(from) && !hasLeafNode(from))
-                || (!hasNetworkingNode(to) && !hasLeafNode(to)))
+                || (!hasNetworkingNode(to) && !hasLeafNode(to))) {
             throw new IllegalArgumentException("Cannot test nodes not in network");
+        }
 
         return isInDistanceInternal(distance, from, to, nodePair);
     }
 
     private boolean isInDistanceInternal(int distance, NetworkNode from, NetworkNode to, TwoNetworkNodes cachePairKey) {
-        if (from.equals(to))
+        if (from.equals(to)) {
             return true;
+        }
 
-        if (distance == 0)
+        if (distance == 0) {
             return false;
+        }
 
-        if (SimpleNetwork.areNodesConnecting(from, to))
+        if (SimpleNetwork.areNodesConnecting(from, to)) {
             return true;
+        }
 
         // Breadth-first search of the network
         Set<NetworkNode> visitedNodes = Sets.newHashSet();
@@ -268,8 +357,9 @@ public class SimpleNetwork implements Network {
             }
 
             Set<NetworkNode> nextNetworkingNodesToTest = Sets.newHashSet();
-            for (NetworkNode nodeToTest : networkingNodesToTest)
+            for (NetworkNode nodeToTest : networkingNodesToTest) {
                 listConnectedNotVisitedNetworkingNodes(visitedNodes, nodeToTest, nextNetworkingNodesToTest);
+            }
 
             networkingNodesToTest = nextNetworkingNodesToTest;
         }
@@ -279,15 +369,16 @@ public class SimpleNetwork implements Network {
 
     @Override
     public boolean isInDistanceWithSide(int distance, NetworkNode from, NetworkNode to, Side toSide) {
-        to = new NetworkNode(to.location.toVector3i(), toSide);
-        TwoNetworkNodes nodePair = new TwoNetworkNodes(from, to);
-        return isInDistanceInternal(distance, from, to, nodePair);
+        NetworkNode destination = new NetworkNode(to.location.toVector3i(), toSide);
+        TwoNetworkNodes nodePair = new TwoNetworkNodes(from, destination);
+        return isInDistanceInternal(distance, from, destination, nodePair);
     }
 
     @Override
     public byte getLeafSidesInNetwork(NetworkNode networkNode) {
-        if (!hasLeafNode(networkNode))
+        if (!hasLeafNode(networkNode)) {
             throw new IllegalArgumentException("Cannot test nodes not in network");
+        }
 
         if (networkingNodes.size() == 0) {
             // Degenerated network
@@ -309,7 +400,7 @@ public class SimpleNetwork implements Network {
                 possibleLocation.add(connectingOnSide.getVector3i());
                 for (NetworkNode node : networkingNodes.get(new ImmutableBlockLocation(possibleLocation))) {
                     if (SideBitFlag.hasSide(node.connectionSides, connectingOnSide.reverse())) {
-                        result+=SideBitFlag.getSide(connectingOnSide);
+                        result += SideBitFlag.getSide(connectingOnSide);
                     }
                 }
             }
@@ -340,8 +431,22 @@ public class SimpleNetwork implements Network {
         for (Side connectingOnSide : SideBitFlag.getSides(location.connectionSides)) {
             final ImmutableBlockLocation possibleConnectionLocation = location.location.move(connectingOnSide);
             for (NetworkNode possibleConnection : networkingNodes.get(possibleConnectionLocation)) {
-                if (!visitedNodes.contains(possibleConnection) && SideBitFlag.hasSide(possibleConnection.connectionSides, connectingOnSide.reverse()))
+                if (!visitedNodes.contains(possibleConnection) && SideBitFlag.hasSide(possibleConnection.connectionSides, connectingOnSide.reverse())) {
                     result.add(possibleConnection);
+                }
+            }
+        }
+    }
+
+    private void listConnectedNotVisitedNetworkingNodes(Map<NetworkNode, List<NetworkNode>> visitedNodes, NetworkNode location, Map<NetworkNode, List<NetworkNode>> result) {
+        for (Side connectingOnSide : SideBitFlag.getSides(location.connectionSides)) {
+            final ImmutableBlockLocation possibleConnectionLocation = location.location.move(connectingOnSide);
+            for (NetworkNode possibleConnection : networkingNodes.get(possibleConnectionLocation)) {
+                if (!visitedNodes.containsKey(possibleConnection) && SideBitFlag.hasSide(possibleConnection.connectionSides, connectingOnSide.reverse())) {
+                    List<NetworkNode> pathToNewNode = new LinkedList<>(visitedNodes.get(location));
+                    pathToNewNode.add(possibleConnection);
+                    result.put(possibleConnection, pathToNewNode);
+                }
             }
         }
     }

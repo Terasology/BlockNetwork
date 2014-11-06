@@ -6,6 +6,8 @@ import org.terasology.math.Side;
 import org.terasology.math.SideBitFlag;
 import org.terasology.math.Vector3i;
 
+import java.util.List;
+
 import static org.junit.Assert.*;
 
 public class SimpleNetworkTest {
@@ -145,7 +147,7 @@ public class SimpleNetworkTest {
         assertTrue(network.isInDistance(0, toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(0, 0, 0), allDirections)));
         assertEquals(0, network.getDistance(toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(0, 0, 0), allDirections)));
     }
-    
+
     @Test
     public void distanceForDegeneratedNetwork() {
         network = SimpleNetwork.createDegenerateNetwork(toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(0, 0, 1), allDirections));
@@ -185,8 +187,9 @@ public class SimpleNetworkTest {
 
     @Test
     public void distanceForLongNetwork() {
-        for (int i=0; i<10; i++)
+        for (int i = 0; i < 10; i++) {
             network.addNetworkingNode(toNode(new Vector3i(0, 0, i), allDirections));
+        }
 
         assertTrue(network.isInDistance(9, toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(0, 0, 9), allDirections)));
         assertFalse(network.isInDistance(8, toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(0, 0, 9), allDirections)));
@@ -195,15 +198,41 @@ public class SimpleNetworkTest {
 
     @Test
     public void distanceForBranchedNetwork() {
-        for (int i=0; i<10; i++)
+        for (int i = 0; i < 10; i++) {
             network.addNetworkingNode(toNode(new Vector3i(0, 0, i), allDirections));
+        }
 
-        for (int i=1; i<=5; i++)
+        for (int i = 1; i <= 5; i++) {
             network.addNetworkingNode(toNode(new Vector3i(i, 0, 5), allDirections));
+        }
 
         assertTrue(network.isInDistance(10, toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(5, 0, 5), allDirections)));
         assertFalse(network.isInDistance(9, toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(5, 0, 5), allDirections)));
         assertEquals(10, network.getDistance(toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(5, 0, 5), allDirections)));
+    }
 
+    @Test
+    public void shortestRouteForBranchedNetwork() {
+        for (int i = 0; i < 10; i++) {
+            network.addNetworkingNode(toNode(new Vector3i(0, 0, i), allDirections));
+        }
+
+        for (int i = 1; i <= 5; i++) {
+            network.addNetworkingNode(toNode(new Vector3i(i, 0, 5), allDirections));
+        }
+
+        final List<NetworkNode> route = network.findShortestRoute(toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(5, 0, 5), allDirections));
+        assertEquals(11, route.size());
+        assertEquals(toNode(new Vector3i(0, 0, 0), allDirections), route.get(0));
+        assertEquals(toNode(new Vector3i(0, 0, 1), allDirections), route.get(1));
+        assertEquals(toNode(new Vector3i(0, 0, 2), allDirections), route.get(2));
+        assertEquals(toNode(new Vector3i(0, 0, 3), allDirections), route.get(3));
+        assertEquals(toNode(new Vector3i(0, 0, 4), allDirections), route.get(4));
+        assertEquals(toNode(new Vector3i(0, 0, 5), allDirections), route.get(5));
+        assertEquals(toNode(new Vector3i(1, 0, 5), allDirections), route.get(6));
+        assertEquals(toNode(new Vector3i(2, 0, 5), allDirections), route.get(7));
+        assertEquals(toNode(new Vector3i(3, 0, 5), allDirections), route.get(8));
+        assertEquals(toNode(new Vector3i(4, 0, 5), allDirections), route.get(9));
+        assertEquals(toNode(new Vector3i(5, 0, 5), allDirections), route.get(10));
     }
 }
