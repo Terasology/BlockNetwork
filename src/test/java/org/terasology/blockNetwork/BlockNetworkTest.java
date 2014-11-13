@@ -1,5 +1,23 @@
+/*
+ * Copyright 2014 MovingBlocks
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.terasology.blockNetwork;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 import org.junit.Before;
 import org.junit.Test;
 import org.terasology.math.Side;
@@ -7,11 +25,10 @@ import org.terasology.math.Vector3i;
 
 import java.util.Set;
 
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
-import com.google.common.collect.HashMultimap;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class BlockNetworkTest {
     private BlockNetwork blockNetwork;
@@ -253,31 +270,35 @@ public class BlockNetworkTest {
         }
 
         @Override
-        public void networkingNodesAdded(Network network, Set<NetworkNode> networkingNodes) {
+        public void networkingNodesAdded(Network network, Set<NetworkNode> networkingNodesAdded) {
             assertTrue(networks.contains(network));
-            for (NetworkNode networkingNode : networkingNodes)
+            for (NetworkNode networkingNode : networkingNodesAdded) {
                 assertTrue(this.networkingNodes.put(network, networkingNode));
+            }
         }
 
         @Override
-        public void networkingNodesRemoved(Network network, Set<NetworkNode> networkingNodes) {
+        public void networkingNodesRemoved(Network network, Set<NetworkNode> networkingNodesRemoved) {
             assertTrue(networks.contains(network));
-            for (NetworkNode networkingNode : networkingNodes)
+            for (NetworkNode networkingNode : networkingNodesRemoved) {
                 assertTrue(this.networkingNodes.remove(network, networkingNode));
+            }
         }
 
         @Override
-        public void leafNodesAdded(Network network, Set<NetworkNode> leafNodes) {
+        public void leafNodesAdded(Network network, Set<NetworkNode> leafNodesAdded) {
             assertTrue(networks.contains(network));
-            for (NetworkNode leafNode : leafNodes)
+            for (NetworkNode leafNode : leafNodesAdded) {
                 assertTrue(this.leafNodes.put(network, leafNode));
+            }
         }
 
         @Override
-        public void leafNodesRemoved(Network network, Set<NetworkNode> leafNodes) {
+        public void leafNodesRemoved(Network network, Set<NetworkNode> leafNodesRemoved) {
             assertTrue(networks.contains(network));
-            for (NetworkNode leafNode : leafNodes)
+            for (NetworkNode leafNode : leafNodesRemoved) {
                 assertTrue(this.leafNodes.remove(network, leafNode));
+            }
         }
 
         @Override

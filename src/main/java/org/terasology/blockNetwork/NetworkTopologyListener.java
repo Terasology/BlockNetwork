@@ -1,17 +1,32 @@
+/*
+ * Copyright 2014 MovingBlocks
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.terasology.blockNetwork;
 
-import org.terasology.math.Vector3i;
-
-import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.Multimap;
-
 public interface NetworkTopologyListener {
-    public void networkAdded(Network network);
-    public void networkingNodesAdded(Network network, Set<NetworkNode> networkingNodes);
-    public void networkingNodesRemoved(Network network, Set<NetworkNode> networkingNodes);
-    public void leafNodesAdded(Network network, Set<NetworkNode> leafNodes);
-    public void leafNodesRemoved(Network network, Set<NetworkNode> leafNodes);
-    public void networkRemoved(Network network);
+    void networkAdded(Network network);
+
+    void networkingNodesAdded(Network network, Set<NetworkNode> networkingNodes);
+
+    void networkingNodesRemoved(Network network, Set<NetworkNode> networkingNodes);
+
+    void leafNodesAdded(Network network, Set<NetworkNode> leafNodes);
+
+    void leafNodesRemoved(Network network, Set<NetworkNode> leafNodes);
+
+    void networkRemoved(Network network);
 }
