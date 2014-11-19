@@ -19,8 +19,6 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -33,8 +31,6 @@ import java.util.Set;
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
 public class BlockNetwork {
-    private static final Logger logger = LoggerFactory.getLogger(BlockNetwork.class);
-
     private Set<SimpleNetwork> networks = Sets.newHashSet();
     private Multimap<ImmutableBlockLocation, NetworkNode> leafNodes = HashMultimap.create();
     private Multimap<ImmutableBlockLocation, NetworkNode> networkingNodes = HashMultimap.create();
@@ -157,7 +153,6 @@ public class BlockNetwork {
     }
 
     public void addLeafBlock(NetworkNode networkNode) {
-        logger.info("Adding leaf node: " + networkNode.toString());
         validateNotMutating();
         mutating = true;
         try {
@@ -194,13 +189,11 @@ public class BlockNetwork {
     }
 
     public void updateNetworkingBlock(NetworkNode oldNode, NetworkNode newNode) {
-        logger.info("Replacing networking node: " + oldNode.toString() + " with: " + newNode.toString());
         removeNetworkingBlock(oldNode);
         addNetworkingBlock(newNode);
     }
 
     public void updateLeafBlock(NetworkNode oldNode, NetworkNode newNode) {
-        logger.info("Replacing leaf node: " + oldNode.toString() + " with: " + newNode.toString());
         removeLeafBlock(oldNode);
         addLeafBlock(newNode);
     }
@@ -288,7 +281,6 @@ public class BlockNetwork {
     }
 
     public void removeLeafBlock(NetworkNode networkNode) {
-        logger.info("Removing leaf node: " + networkNode.toString());
         validateNotMutating();
         mutating = true;
         try {

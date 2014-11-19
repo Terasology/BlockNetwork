@@ -38,8 +38,8 @@ public class TwoNetworkNodes {
 
         TwoNetworkNodes that = (TwoNetworkNodes) o;
 
-        return ((that.node1.equals(node1) && that.node2.equals(node2))
-                || (that.node1.equals(node2) && that.node2.equals(node1)));
+        return that.node1.equals(node1) && that.node2.equals(node2)
+                || that.node1.equals(node2) && that.node2.equals(node1);
     }
 
     @Override

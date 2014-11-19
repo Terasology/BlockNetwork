@@ -226,10 +226,7 @@ public class SimpleNetwork implements Network {
             return cachedDistance;
         }
 
-        if ((!hasNetworkingNode(from) && !hasLeafNode(from))
-                || (!hasNetworkingNode(to) && !hasLeafNode(to))) {
-            throw new IllegalArgumentException("Cannot test nodes not in network");
-        }
+        validateAnyOfTheNodesInNetwork(from, to);
 
         if (from.equals(to)) {
             return 0;
@@ -277,10 +274,7 @@ public class SimpleNetwork implements Network {
             return Collections.unmodifiableList(cachedRoute);
         }
 
-        if ((!hasNetworkingNode(from) && !hasLeafNode(from))
-                || (!hasNetworkingNode(to) && !hasLeafNode(to))) {
-            throw new IllegalArgumentException("Cannot test nodes not in network");
-        }
+        validateAnyOfTheNodesInNetwork(from, to);
 
         if (from.equals(to)) {
             return Arrays.asList(from);
@@ -332,12 +326,16 @@ public class SimpleNetwork implements Network {
             return cachedDistance <= distance;
         }
 
-        if ((!hasNetworkingNode(from) && !hasLeafNode(from))
-                || (!hasNetworkingNode(to) && !hasLeafNode(to))) {
-            throw new IllegalArgumentException("Cannot test nodes not in network");
-        }
+        validateAnyOfTheNodesInNetwork(from, to);
 
         return isInDistanceInternal(distance, from, to, nodePair);
+    }
+
+    private void validateAnyOfTheNodesInNetwork(NetworkNode from, NetworkNode to) {
+        if (!hasNetworkingNode(from) && !hasLeafNode(from)
+                || !hasNetworkingNode(to) && !hasLeafNode(to)) {
+            throw new IllegalArgumentException("Cannot test nodes not in network");
+        }
     }
 
     private boolean isInDistanceInternal(int distance, NetworkNode from, NetworkNode to, TwoNetworkNodes cachePairKey) {
