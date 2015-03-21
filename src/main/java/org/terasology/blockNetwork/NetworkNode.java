@@ -17,7 +17,7 @@ package org.terasology.blockNetwork;
 
 import org.terasology.math.Side;
 import org.terasology.math.SideBitFlag;
-import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3i;
 
 /**
  * @author Marcin Sciesinski <marcins78@gmail.com>
