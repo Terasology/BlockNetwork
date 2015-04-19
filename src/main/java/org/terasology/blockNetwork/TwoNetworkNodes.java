@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,6 @@
  */
 package org.terasology.blockNetwork;
 
-/**
- * @author Marcin Sciesinski <marcins78@gmail.com>
- */
 public class TwoNetworkNodes {
     public final NetworkNode node1;
     public final NetworkNode node2;

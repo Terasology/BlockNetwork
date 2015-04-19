@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,6 @@ import org.terasology.math.Side;
 import org.terasology.math.SideBitFlag;
 import org.terasology.math.geom.Vector3i;
 
-/**
- * @author Marcin Sciesinski <marcins78@gmail.com>
- */
 public class NetworkNode {
     public final ImmutableBlockLocation location;
     public final byte connectionSides;

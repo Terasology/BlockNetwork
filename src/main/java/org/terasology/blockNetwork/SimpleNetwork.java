@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,8 +44,6 @@ import java.util.Set;
  * 1. The same node (defined as location) cannot be both a networking node and a leaf node in the same network.
  * 2. The same leaf node can be a member of multiple disjunctive networks (different network on each side).
  * 3. A valid network can have no networking nodes at all, and exactly two leaf nodes (neighbouring leaf nodes).
- *
- * @author Marcin Sciesinski <marcins78@gmail.com>
  */
 public class SimpleNetwork implements Network {
     private static final boolean SANITY_CHECK = false;
