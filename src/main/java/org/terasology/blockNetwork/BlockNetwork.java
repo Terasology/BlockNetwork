@@ -27,20 +27,20 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-public class BlockNetwork {
-    private Set<SimpleNetwork> networks = Sets.newHashSet();
-    private Multimap<ImmutableBlockLocation, NetworkNode> leafNodes = HashMultimap.create();
-    private Multimap<ImmutableBlockLocation, NetworkNode> networkingNodes = HashMultimap.create();
+public class BlockNetwork<T extends NetworkNode> {
+    private Set<SimpleNetwork<T>> networks = Sets.newHashSet();
+    private Multimap<ImmutableBlockLocation, T> leafNodes = HashMultimap.create();
+    private Multimap<ImmutableBlockLocation, T> networkingNodes = HashMultimap.create();
 
-    private Set<NetworkTopologyListener> listeners = new HashSet<>();
+    private Set<NetworkTopologyListener<T>> listeners = new HashSet<>();
 
     private boolean mutating;
 
-    public void addTopologyListener(NetworkTopologyListener listener) {
+    public void addTopologyListener(NetworkTopologyListener<T> listener) {
         listeners.add(listener);
     }
 
-    public void removeTopologyListener(NetworkTopologyListener listener) {
+    public void removeTopologyListener(NetworkTopologyListener<T> listener) {
         listeners.remove(listener);
     }
 
@@ -50,7 +50,7 @@ public class BlockNetwork {
         }
     }
 
-    public void addNetworkingBlock(NetworkNode networkNode) {
+    public void addNetworkingBlock(T networkNode) {
         validateNotMutating();
         mutating = true;
         try {
@@ -63,47 +63,47 @@ public class BlockNetwork {
         }
     }
 
-    public void addNetworkingBlocks(Collection<NetworkNode> networkNodes) {
+    public void addNetworkingBlocks(Collection<T> networkNodes) {
         // No major optimization possible here
-        for (NetworkNode networkNode : networkNodes) {
+        for (T networkNode : networkNodes) {
             addNetworkingBlock(networkNode);
         }
     }
 
-    private void validateNoNetworkingOverlap(NetworkNode networkNode) {
-        for (NetworkNode nodeAtSamePosition : networkingNodes.get(networkNode.location)) {
+    private void validateNoNetworkingOverlap(T networkNode) {
+        for (T nodeAtSamePosition : networkingNodes.get(networkNode.location)) {
             if ((nodeAtSamePosition.connectionSides & networkNode.connectionSides) > 0) {
                 throw new IllegalStateException("There is a networking block at that position connecting to some of the same sides already");
             }
         }
     }
 
-    private void validateNoLeafOverlap(NetworkNode networkNode) {
-        for (NetworkNode nodeAtSamePosition : leafNodes.get(networkNode.location)) {
+    private void validateNoLeafOverlap(T networkNode) {
+        for (T nodeAtSamePosition : leafNodes.get(networkNode.location)) {
             if ((nodeAtSamePosition.connectionSides & networkNode.connectionSides) > 0) {
                 throw new IllegalStateException("There is a leaf block at that position connecting to some of the same sides already");
             }
         }
     }
 
-    private void addNetworkingBlockInternal(NetworkNode networkNode) {
-        SimpleNetwork addToNetwork = null;
+    private void addNetworkingBlockInternal(T networkNode) {
+        SimpleNetwork<T> addToNetwork = null;
 
-        Set<NetworkNode> networkingNodesToAdd = Sets.newHashSet();
+        Set<T> networkingNodesToAdd = Sets.newHashSet();
         networkingNodesToAdd.add(networkNode);
 
-        Set<NetworkNode> newLeafNodes = Sets.newHashSet();
+        Set<T> newLeafNodes = Sets.newHashSet();
 
         // Try adding to existing networks
-        final Iterator<SimpleNetwork> networkIterator = networks.iterator();
+        final Iterator<SimpleNetwork<T>> networkIterator = networks.iterator();
         while (networkIterator.hasNext()) {
-            final SimpleNetwork network = networkIterator.next();
+            final SimpleNetwork<T> network = networkIterator.next();
             if (network.canAddNetworkingNode(networkNode)) {
                 if (addToNetwork == null) {
                     addToNetwork = network;
                 } else {
-                    Set<NetworkNode> networkingNodesToNotify = Sets.newHashSet(network.getNetworkingNodes());
-                    Set<NetworkNode> leafNodesToNotify = Sets.newHashSet(network.getLeafNodes());
+                    Set<T> networkingNodesToNotify = Sets.newHashSet(network.getNetworkingNodes());
+                    Set<T> leafNodesToNotify = Sets.newHashSet(network.getLeafNodes());
 
                     networkingNodesToAdd.addAll(networkingNodesToNotify);
                     newLeafNodes.addAll(leafNodesToNotify);
@@ -121,23 +121,23 @@ public class BlockNetwork {
 
         // If it's not in any networks, create a new one
         if (addToNetwork == null) {
-            SimpleNetwork newNetwork = new SimpleNetwork();
+            SimpleNetwork<T> newNetwork = new SimpleNetwork<>();
             networks.add(newNetwork);
             notifyNetworkAdded(newNetwork);
             addToNetwork = newNetwork;
         }
 
-        for (NetworkNode networkingNode : networkingNodesToAdd) {
+        for (T networkingNode : networkingNodesToAdd) {
             addToNetwork.addNetworkingNode(networkingNode);
         }
         notifyNetworkingNodesAdded(addToNetwork, networkingNodesToAdd);
 
-        for (NetworkNode leafNode : newLeafNodes) {
+        for (T leafNode : newLeafNodes) {
             addToNetwork.addLeafNode(leafNode);
         }
 
         // Find all leaf nodes that it joins to its network
-        for (NetworkNode leafNode : leafNodes.values()) {
+        for (T leafNode : leafNodes.values()) {
             if (addToNetwork.canAddLeafNode(leafNode)) {
                 addToNetwork.addLeafNode(leafNode);
                 newLeafNodes.add(leafNode);
@@ -149,13 +149,13 @@ public class BlockNetwork {
         }
     }
 
-    public void addLeafBlock(NetworkNode networkNode) {
+    public void addLeafBlock(T networkNode) {
         validateNotMutating();
         mutating = true;
         try {
             validateNoLeafOverlap(networkNode);
 
-            for (SimpleNetwork network : networks) {
+            for (SimpleNetwork<T> network : networks) {
                 if (network.canAddLeafNode(networkNode)) {
                     network.addLeafNode(networkNode);
                     notifyLeafNodesAdded(network, Collections.singleton(networkNode));
@@ -163,9 +163,9 @@ public class BlockNetwork {
             }
 
             // Check for new degenerated networks
-            for (NetworkNode leafNode : leafNodes.values()) {
+            for (T leafNode : leafNodes.values()) {
                 if (SimpleNetwork.areNodesConnecting(networkNode, leafNode)) {
-                    SimpleNetwork degenerateNetwork = SimpleNetwork.createDegenerateNetwork(networkNode, leafNode);
+                    SimpleNetwork<T> degenerateNetwork = SimpleNetwork.createDegenerateNetwork(networkNode, leafNode);
                     networks.add(degenerateNetwork);
                     notifyNetworkAdded(degenerateNetwork);
                     notifyLeafNodesAdded(degenerateNetwork, Sets.newHashSet(networkNode, leafNode));
@@ -178,28 +178,28 @@ public class BlockNetwork {
         }
     }
 
-    public void addLeafBlocks(Collection<NetworkNode> networkNodes) {
+    public void addLeafBlocks(Collection<T> networkNodes) {
         // No optimizations can be made here
-        for (NetworkNode networkNode : networkNodes) {
+        for (T networkNode : networkNodes) {
             addLeafBlock(networkNode);
         }
     }
 
-    public void updateNetworkingBlock(NetworkNode oldNode, NetworkNode newNode) {
+    public void updateNetworkingBlock(T oldNode, T newNode) {
         removeNetworkingBlock(oldNode);
         addNetworkingBlock(newNode);
     }
 
-    public void updateLeafBlock(NetworkNode oldNode, NetworkNode newNode) {
+    public void updateLeafBlock(T oldNode, T newNode) {
         removeLeafBlock(oldNode);
         addLeafBlock(newNode);
     }
 
-    public void removeNetworkingBlock(NetworkNode networkNode) {
+    public void removeNetworkingBlock(T networkNode) {
         validateNotMutating();
         mutating = true;
         try {
-            SimpleNetwork networkWithBlock = findNetworkWithNetworkingBlock(networkNode);
+            SimpleNetwork<T> networkWithBlock = findNetworkWithNetworkingBlock(networkNode);
 
             if (networkWithBlock == null) {
                 throw new IllegalStateException("Trying to remove a networking block that doesn't belong to any network");
@@ -210,8 +210,8 @@ public class BlockNetwork {
             // Naive implementation, just remove everything and start over
             // TODO: Improve to actually detects the branches of splits and build separate network for each disjunctioned
             // TODO: network
-            Set<NetworkNode> networkingNodesToNotify = Sets.newHashSet(networkWithBlock.getNetworkingNodes());
-            Set<NetworkNode> leafNodesToNotify = Sets.newHashSet(networkWithBlock.getLeafNodes());
+            Set<T> networkingNodesToNotify = Sets.newHashSet(networkWithBlock.getNetworkingNodes());
+            Set<T> leafNodesToNotify = Sets.newHashSet(networkWithBlock.getLeafNodes());
 
             networkWithBlock.removeAllLeafNodes();
             notifyLeafNodesRemoved(networkWithBlock, leafNodesToNotify);
@@ -221,7 +221,7 @@ public class BlockNetwork {
             networks.remove(networkWithBlock);
             notifyNetworkRemoved(networkWithBlock);
 
-            for (NetworkNode networkingNode : networkingNodesToNotify) {
+            for (T networkingNode : networkingNodesToNotify) {
                 if (!networkingNode.equals(networkNode)) {
                     addNetworkingBlockInternal(networkingNode);
                 }
@@ -231,7 +231,7 @@ public class BlockNetwork {
         }
     }
 
-    public void removeNetworkingBlocks(Collection<NetworkNode> networkNodes) {
+    public void removeNetworkingBlocks(Collection<T> networkNodes) {
         if (networkNodes.size() == 0) {
             return;
         }
@@ -240,9 +240,9 @@ public class BlockNetwork {
         validateNotMutating();
         mutating = true;
         try {
-            Set<SimpleNetwork> affectedNetworks = Sets.newHashSet();
-            for (NetworkNode networkNode : networkNodes) {
-                final SimpleNetwork networkWithBlock = findNetworkWithNetworkingBlock(networkNode);
+            Set<SimpleNetwork<T>> affectedNetworks = Sets.newHashSet();
+            for (T networkNode : networkNodes) {
+                final SimpleNetwork<T> networkWithBlock = findNetworkWithNetworkingBlock(networkNode);
                 if (networkWithBlock == null) {
                     throw new IllegalStateException("Trying to remove a networking block that doesn't belong to any network");
                 }
@@ -251,10 +251,10 @@ public class BlockNetwork {
                 networkingNodes.remove(networkNode.location, networkNode);
             }
 
-            List<Set<NetworkNode>> listOfNodesFromModifiedNetworks = Lists.newLinkedList();
-            for (SimpleNetwork networkWithBlock : affectedNetworks) {
-                Set<NetworkNode> leafNodesToNotify = Sets.newHashSet(networkWithBlock.getLeafNodes());
-                Set<NetworkNode> networkingNodesToNotify = Sets.newHashSet(networkWithBlock.getNetworkingNodes());
+            List<Set<T>> listOfNodesFromModifiedNetworks = Lists.newLinkedList();
+            for (SimpleNetwork<T> networkWithBlock : affectedNetworks) {
+                Set<T> leafNodesToNotify = Sets.newHashSet(networkWithBlock.getLeafNodes());
+                Set<T> networkingNodesToNotify = Sets.newHashSet(networkWithBlock.getNetworkingNodes());
 
                 networkWithBlock.removeAllLeafNodes();
                 notifyLeafNodesAdded(networkWithBlock, leafNodesToNotify);
@@ -265,8 +265,8 @@ public class BlockNetwork {
                 notifyNetworkRemoved(networkWithBlock);
             }
 
-            for (Set<NetworkNode> networkingNodesInModifiedNetwork : listOfNodesFromModifiedNetworks) {
-                for (NetworkNode networkingNode : networkingNodesInModifiedNetwork) {
+            for (Set<T> networkingNodesInModifiedNetwork : listOfNodesFromModifiedNetworks) {
+                for (T networkingNode : networkingNodesInModifiedNetwork) {
                     if (!networkNodes.contains(networkingNode)) {
                         addNetworkingBlockInternal(networkingNode);
                     }
@@ -277,22 +277,22 @@ public class BlockNetwork {
         }
     }
 
-    public void removeLeafBlock(NetworkNode networkNode) {
+    public void removeLeafBlock(T networkNode) {
         validateNotMutating();
         mutating = true;
         try {
             if (!leafNodes.remove(networkNode.location, networkNode)) {
                 throw new IllegalArgumentException("Leaf node not found in the BlockNetwork");
             }
-            final Iterator<SimpleNetwork> networkIterator = networks.iterator();
+            final Iterator<SimpleNetwork<T>> networkIterator = networks.iterator();
             while (networkIterator.hasNext()) {
-                final SimpleNetwork network = networkIterator.next();
+                final SimpleNetwork<T> network = networkIterator.next();
                 if (network.hasLeafNode(networkNode)) {
                     boolean degenerate = network.removeLeafNode(networkNode);
                     if (!degenerate) {
                         notifyLeafNodesRemoved(network, Collections.singleton(networkNode));
                     } else {
-                        NetworkNode onlyLeafNode = network.getLeafNodes().iterator().next();
+                        T onlyLeafNode = network.getLeafNodes().iterator().next();
                         notifyLeafNodesRemoved(network, Sets.newHashSet(networkNode, onlyLeafNode));
 
                         networkIterator.remove();
@@ -305,23 +305,23 @@ public class BlockNetwork {
         }
     }
 
-    public void removeLeafBlocks(Collection<NetworkNode> networkNodes) {
+    public void removeLeafBlocks(Collection<T> networkNodes) {
         // No optimization can be made here
-        for (NetworkNode networkNode : networkNodes) {
+        for (T networkNode : networkNodes) {
             removeLeafBlock(networkNode);
         }
     }
 
-    public Collection<? extends Network> getNetworks() {
+    public Collection<? extends Network<T>> getNetworks() {
         return Collections.unmodifiableCollection(networks);
     }
 
-    public boolean isNetworkActive(Network network) {
+    public boolean isNetworkActive(Network<T> network) {
         return networks.contains(network);
     }
 
-    private SimpleNetwork findNetworkWithNetworkingBlock(NetworkNode networkNode) {
-        for (SimpleNetwork network : networks) {
+    private SimpleNetwork<T> findNetworkWithNetworkingBlock(T networkNode) {
+        for (SimpleNetwork<T> network : networks) {
             if (network.hasNetworkingNode(networkNode)) {
                 return network;
             }
@@ -329,42 +329,42 @@ public class BlockNetwork {
         return null;
     }
 
-    public Network getNetworkWithNetworkingBlock(NetworkNode networkNode) {
+    public Network getNetworkWithNetworkingBlock(T networkNode) {
         return findNetworkWithNetworkingBlock(networkNode);
     }
 
-    private void notifyNetworkAdded(SimpleNetwork network) {
-        for (NetworkTopologyListener listener : listeners) {
+    private void notifyNetworkAdded(SimpleNetwork<T> network) {
+        for (NetworkTopologyListener<T> listener : listeners) {
             listener.networkAdded(network);
         }
     }
 
-    private void notifyNetworkRemoved(SimpleNetwork network) {
-        for (NetworkTopologyListener listener : listeners) {
+    private void notifyNetworkRemoved(SimpleNetwork<T> network) {
+        for (NetworkTopologyListener<T> listener : listeners) {
             listener.networkRemoved(network);
         }
     }
 
-    private void notifyNetworkingNodesAdded(SimpleNetwork network, Set<NetworkNode> networkingNodesToNotify) {
-        for (NetworkTopologyListener listener : listeners) {
+    private void notifyNetworkingNodesAdded(SimpleNetwork<T> network, Set<T> networkingNodesToNotify) {
+        for (NetworkTopologyListener<T> listener : listeners) {
             listener.networkingNodesAdded(network, networkingNodesToNotify);
         }
     }
 
-    private void notifyNetworkingNodesRemoved(SimpleNetwork network, Set<NetworkNode> networkingNodesToNotify) {
-        for (NetworkTopologyListener listener : listeners) {
+    private void notifyNetworkingNodesRemoved(SimpleNetwork<T> network, Set<T> networkingNodesToNotify) {
+        for (NetworkTopologyListener<T> listener : listeners) {
             listener.networkingNodesRemoved(network, networkingNodesToNotify);
         }
     }
 
-    private void notifyLeafNodesAdded(SimpleNetwork network, Set<NetworkNode> leafNodesToNotify) {
-        for (NetworkTopologyListener listener : listeners) {
+    private void notifyLeafNodesAdded(SimpleNetwork<T> network, Set<T> leafNodesToNotify) {
+        for (NetworkTopologyListener<T> listener : listeners) {
             listener.leafNodesAdded(network, leafNodesToNotify);
         }
     }
 
-    private void notifyLeafNodesRemoved(SimpleNetwork network, Set<NetworkNode> leafNodesToNotify) {
-        for (NetworkTopologyListener listener : listeners) {
+    private void notifyLeafNodesRemoved(SimpleNetwork<T> network, Set<T> leafNodesToNotify) {
+        for (NetworkTopologyListener<T> listener : listeners) {
             listener.leafNodesRemoved(network, leafNodesToNotify);
         }
     }

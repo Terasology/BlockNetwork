@@ -31,7 +31,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class BlockNetworkTest {
-    private BlockNetwork blockNetwork;
+    private BlockNetwork<NetworkNode> blockNetwork;
     private TestListener listener;
     private byte allDirections;
 
@@ -208,10 +208,10 @@ public class BlockNetworkTest {
         assertEquals(1, blockNetwork.getNetworks().size());
 
         Network network = blockNetwork.getNetworks().iterator().next();
-        assertEquals(4, network.getDistance(leftRight, frontBack));
+        assertEquals(4, network.getDistance(leftRight, frontBack, Integer.MAX_VALUE));
     }
 
-    private class TestListener implements NetworkTopologyListener {
+    private class TestListener implements NetworkTopologyListener<NetworkNode> {
         public int networksAdded;
         public int networksRemoved;
         public int networkingNodesAdded;
@@ -239,27 +239,27 @@ public class BlockNetworkTest {
         }
 
         @Override
-        public void networkingNodesAdded(Network network, Set<NetworkNode> networkingNodes) {
+        public void networkingNodesAdded(Network<NetworkNode> network, Set<NetworkNode> networkingNodes) {
             networkingNodesAdded++;
         }
 
         @Override
-        public void networkingNodesRemoved(Network network, Set<NetworkNode> networkingNodes) {
+        public void networkingNodesRemoved(Network<NetworkNode> network, Set<NetworkNode> networkingNodes) {
             networkingNodesRemoved++;
         }
 
         @Override
-        public void leafNodesAdded(Network network, Set<NetworkNode> leafNodes) {
+        public void leafNodesAdded(Network<NetworkNode> network, Set<NetworkNode> leafNodes) {
             leafNodesAdded++;
         }
 
         @Override
-        public void leafNodesRemoved(Network network, Set<NetworkNode> leafNodes) {
+        public void leafNodesRemoved(Network<NetworkNode> network, Set<NetworkNode> leafNodes) {
             leafNodesRemoved++;
         }
     }
 
-    private class ValidatingListener implements NetworkTopologyListener {
+    private class ValidatingListener implements NetworkTopologyListener<NetworkNode> {
         private Set<Network> networks = Sets.newHashSet();
         private Multimap<Network, NetworkNode> networkingNodes = HashMultimap.create();
         private Multimap<Network, NetworkNode> leafNodes = HashMultimap.create();
@@ -270,7 +270,7 @@ public class BlockNetworkTest {
         }
 
         @Override
-        public void networkingNodesAdded(Network network, Set<NetworkNode> networkingNodesAdded) {
+        public void networkingNodesAdded(Network<NetworkNode> network, Set<NetworkNode> networkingNodesAdded) {
             assertTrue(networks.contains(network));
             for (NetworkNode networkingNode : networkingNodesAdded) {
                 assertTrue(this.networkingNodes.put(network, networkingNode));
@@ -278,7 +278,7 @@ public class BlockNetworkTest {
         }
 
         @Override
-        public void networkingNodesRemoved(Network network, Set<NetworkNode> networkingNodesRemoved) {
+        public void networkingNodesRemoved(Network<NetworkNode> network, Set<NetworkNode> networkingNodesRemoved) {
             assertTrue(networks.contains(network));
             for (NetworkNode networkingNode : networkingNodesRemoved) {
                 assertTrue(this.networkingNodes.remove(network, networkingNode));
@@ -286,7 +286,7 @@ public class BlockNetworkTest {
         }
 
         @Override
-        public void leafNodesAdded(Network network, Set<NetworkNode> leafNodesAdded) {
+        public void leafNodesAdded(Network<NetworkNode> network, Set<NetworkNode> leafNodesAdded) {
             assertTrue(networks.contains(network));
             for (NetworkNode leafNode : leafNodesAdded) {
                 assertTrue(this.leafNodes.put(network, leafNode));
@@ -294,7 +294,7 @@ public class BlockNetworkTest {
         }
 
         @Override
-        public void leafNodesRemoved(Network network, Set<NetworkNode> leafNodesRemoved) {
+        public void leafNodesRemoved(Network<NetworkNode> network, Set<NetworkNode> leafNodesRemoved) {
             assertTrue(networks.contains(network));
             for (NetworkNode leafNode : leafNodesRemoved) {
                 assertTrue(this.leafNodes.remove(network, leafNode));

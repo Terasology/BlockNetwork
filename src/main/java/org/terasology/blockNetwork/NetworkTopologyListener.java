@@ -17,16 +17,16 @@ package org.terasology.blockNetwork;
 
 import java.util.Set;
 
-public interface NetworkTopologyListener {
-    void networkAdded(Network network);
+public interface NetworkTopologyListener<T extends NetworkNode> {
+    void networkAdded(Network<T> network);
 
-    void networkingNodesAdded(Network network, Set<NetworkNode> networkingNodes);
+    void networkingNodesAdded(Network<T> network, Set<T> networkingNodes);
 
-    void networkingNodesRemoved(Network network, Set<NetworkNode> networkingNodes);
+    void networkingNodesRemoved(Network<T> network, Set<T> networkingNodes);
 
-    void leafNodesAdded(Network network, Set<NetworkNode> leafNodes);
+    void leafNodesAdded(Network<T> network, Set<T> leafNodes);
 
-    void leafNodesRemoved(Network network, Set<NetworkNode> leafNodes);
+    void leafNodesRemoved(Network<T> network, Set<T> leafNodes);
 
-    void networkRemoved(Network network);
+    void networkRemoved(Network<T> network);
 }

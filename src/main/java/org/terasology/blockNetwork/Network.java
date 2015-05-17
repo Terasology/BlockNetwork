@@ -20,24 +20,22 @@ import org.terasology.math.Side;
 import java.util.Collection;
 import java.util.List;
 
-public interface Network {
-    boolean hasNetworkingNode(NetworkNode networkNode);
+public interface Network<T extends NetworkNode> {
+    boolean hasNetworkingNode(T networkNode);
 
-    boolean hasLeafNode(NetworkNode networkNode);
+    boolean hasLeafNode(T networkNode);
 
     int getNetworkSize();
 
-    int getDistance(NetworkNode from, NetworkNode to);
+    int getDistance(T from, T to, int maxToSearch);
 
-    List<NetworkNode> findShortestRoute(NetworkNode from, NetworkNode to);
+    int getDistanceWithSide(T from, T to, Side toSide, int maxToSearch);
 
-    boolean isInDistance(int distance, NetworkNode from, NetworkNode to);
+    List<T> findShortestRoute(T from, T to);
 
-    byte getLeafSidesInNetwork(NetworkNode networkNode);
+    byte getLeafSidesInNetwork(T networkNode);
 
-    boolean isInDistanceWithSide(int distance, NetworkNode from, NetworkNode to, Side toSide);
+    Collection<T> getNetworkingNodes();
 
-    Collection<NetworkNode> getNetworkingNodes();
-
-    Collection<NetworkNode> getLeafNodes();
+    Collection<T> getLeafNodes();
 }
