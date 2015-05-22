@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,14 +27,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class SimpleNetworkTest {
-    private SimpleNetwork<NetworkNode> network;
+public class EfficientNetworkTest {
+    private EfficientNetwork<NetworkNode> network;
     private byte allDirections;
     private byte upOnly;
 
     @Before
     public void setup() {
-        network = new SimpleNetwork<>();
+        network = new EfficientNetwork<>();
         allDirections = 63;
         upOnly = SideBitFlag.addSide((byte) 0, Side.TOP);
     }
@@ -66,19 +66,19 @@ public class SimpleNetworkTest {
 
     @Test
     public void creatingDegenerateNetwork() {
-        network = SimpleNetwork.createDegenerateNetwork(toNode(new Vector3i(0, 0, 1), allDirections), toNode(new Vector3i(0, 0, 0), allDirections));
+        network = EfficientNetwork.createLeafOnlyNetwork(toNode(new Vector3i(0, 0, 1), allDirections), toNode(new Vector3i(0, 0, 0), allDirections));
         assertEquals(2, network.getNetworkSize());
     }
 
     @Test
     public void cantAddNetworkingNodeToDegeneratedNetwork() {
-        network = SimpleNetwork.createDegenerateNetwork(toNode(new Vector3i(0, 0, 1), allDirections), toNode(new Vector3i(0, 0, 0), allDirections));
+        network = EfficientNetwork.createLeafOnlyNetwork(toNode(new Vector3i(0, 0, 1), allDirections), toNode(new Vector3i(0, 0, 0), allDirections));
         assertFalse(network.canAddNetworkingNode(toNode(new Vector3i(0, 0, 2), allDirections)));
     }
 
     @Test
     public void cantAddLeafNodeToDegeneratedNetwork() {
-        network = SimpleNetwork.createDegenerateNetwork(toNode(new Vector3i(0, 0, 1), allDirections), toNode(new Vector3i(0, 0, 0), allDirections));
+        network = EfficientNetwork.createLeafOnlyNetwork(toNode(new Vector3i(0, 0, 1), allDirections), toNode(new Vector3i(0, 0, 0), allDirections));
         assertFalse(network.canAddLeafNode(toNode(new Vector3i(0, 0, 2), allDirections)));
     }
 
@@ -134,7 +134,7 @@ public class SimpleNetworkTest {
 
     @Test
     public void cantAddNodeToNetworkWithTwoLeafNodes() {
-        network = SimpleNetwork.createDegenerateNetwork(toNode(new Vector3i(0, 0, 2), allDirections), toNode(new Vector3i(0, 0, 1), allDirections));
+        network = EfficientNetwork.createLeafOnlyNetwork(toNode(new Vector3i(0, 0, 2), allDirections), toNode(new Vector3i(0, 0, 1), allDirections));
 
         assertFalse(network.canAddNetworkingNode(toNode(new Vector3i(0, 0, 0), allDirections)));
     }
@@ -150,9 +150,10 @@ public class SimpleNetworkTest {
 
     @Test
     public void removeLeafNodeFromConnectedNetworkWithOnlyLeafNodes() {
-        network = SimpleNetwork.createDegenerateNetwork(toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(0, 0, 1), allDirections));
+        network = EfficientNetwork.createLeafOnlyNetwork(toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(0, 0, 1), allDirections));
 
-        assertTrue(network.removeLeafNode(toNode(new Vector3i(0, 0, 0), allDirections)));
+        assertTrue(network.isTwoLeafNetwork());
+        network.removeLeafNode(toNode(new Vector3i(0, 0, 0), allDirections));
         assertEquals(1, network.getNetworkSize());
     }
 
@@ -167,7 +168,7 @@ public class SimpleNetworkTest {
 
     @Test
     public void distanceForDegeneratedNetwork() {
-        network = SimpleNetwork.createDegenerateNetwork(toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(0, 0, 1), allDirections));
+        network = EfficientNetwork.createLeafOnlyNetwork(toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(0, 0, 1), allDirections));
 
         assertEquals(1, network.getDistance(toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(0, 0, 1), allDirections), 1));
         assertEquals(1, network.getDistance(toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(0, 0, 1), allDirections), Integer.MAX_VALUE));

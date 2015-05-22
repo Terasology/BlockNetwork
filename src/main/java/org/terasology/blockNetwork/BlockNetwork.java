@@ -27,6 +27,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * @deprecated Use EfficientBlockNetwork, this class will be removed.
+ * @param <T>
+ */
+@Deprecated
 public class BlockNetwork<T extends NetworkNode> {
     private Set<SimpleNetwork<T>> networks = Sets.newHashSet();
     private Multimap<ImmutableBlockLocation, T> leafNodes = HashMultimap.create();

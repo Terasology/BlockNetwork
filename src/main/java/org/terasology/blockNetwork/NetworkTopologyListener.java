@@ -17,6 +17,11 @@ package org.terasology.blockNetwork;
 
 import java.util.Set;
 
+/**
+ * @deprecated Use EfficientBlockNetwork instead with EfficientNetworkTopologyListener, this class will be removed.
+ * @param <T>
+ */
+@Deprecated
 public interface NetworkTopologyListener<T extends NetworkNode> {
     void networkAdded(Network<T> network);
 
