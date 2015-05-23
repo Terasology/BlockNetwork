@@ -25,8 +25,24 @@ public class NetworkNode {
     public final byte inputSides;
     public final byte outputSides;
 
+    /**
+     * @deprecated Use the constructor with separate input and output sides.
+     * @param location
+     * @param connectionSides
+     */
+    @Deprecated
     public NetworkNode(Vector3i location, byte connectionSides) {
         this(location, connectionSides, connectionSides);
+    }
+
+    /**
+     * @deprecated Use the constructor with separate input and output sides.
+     * @param location
+     * @param sides
+     */
+    @Deprecated
+    public NetworkNode(Vector3i location, Side... sides) {
+        this(location, SideBitFlag.getSides(sides));
     }
 
     public NetworkNode(Vector3i location, byte inputSides, byte outputSides) {
@@ -37,10 +53,6 @@ public class NetworkNode {
         this.connectionSides = (byte) (inputSides | outputSides);
         this.inputSides = inputSides;
         this.outputSides = outputSides;
-    }
-
-    public NetworkNode(Vector3i location, Side... sides) {
-        this(location, SideBitFlag.getSides(sides));
     }
 
     @Override

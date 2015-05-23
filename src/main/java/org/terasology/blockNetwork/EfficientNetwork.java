@@ -358,7 +358,7 @@ public class EfficientNetwork<T extends NetworkNode> implements Network2<T> {
     public int getDistanceWithSide(T from, T to, Side toSide, int maxToSearch) {
         validateAnyOfTheNodesInNetwork(from, to);
 
-        NetworkNode destination = new NetworkNode(to.location.toVector3i(), toSide);
+        NetworkNode destination = new NetworkNode(to.location.toVector3i(), (byte) 0, SideBitFlag.getSide(toSide));
         return getDistanceInternal(from, destination, maxToSearch);
     }
 
