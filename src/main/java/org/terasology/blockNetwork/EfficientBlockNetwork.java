@@ -18,6 +18,7 @@ package org.terasology.blockNetwork;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+import org.terasology.math.geom.Vector3i;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -44,6 +45,22 @@ public class EfficientBlockNetwork<T extends NetworkNode> {
 
     public void addNetworkingBlock(T networkNode, NetworkChangeReason reason) {
         addNetworkingBlocks(Collections.singleton(networkNode), reason);
+    }
+
+    public Collection<T> getLeafNodesAt(Vector3i location) {
+        return leafNodes.get(new ImmutableBlockLocation(location));
+    }
+
+    public Collection<T> getNetworkingNodesAt(Vector3i location) {
+        return networkingNodes.get(new ImmutableBlockLocation(location));
+    }
+
+    public boolean containsLeafNode(T node) {
+        return leafNodes.containsValue(node);
+    }
+
+    public boolean containsNetworkingNode(T node) {
+        return networkingNodes.containsValue(node);
     }
 
     public void addNetworkingBlocks(Collection<T> networkNodes, NetworkChangeReason reason) {
@@ -226,16 +243,6 @@ public class EfficientBlockNetwork<T extends NetworkNode> {
                 notifyNetworkAdded(degenerateNetwork, reason);
             }
         }
-    }
-
-    public void updateNetworkingBlock(T oldNode, T newNode, NetworkChangeReason reason) {
-        removeNetworkingBlock(oldNode, reason);
-        addNetworkingBlock(newNode, reason);
-    }
-
-    public void updateLeafBlock(T oldNode, T newNode, NetworkChangeReason reason) {
-        removeLeafBlock(oldNode, reason);
-        addLeafBlock(newNode, reason);
     }
 
     public void removeNetworkingBlock(T networkNode, NetworkChangeReason reason) {
