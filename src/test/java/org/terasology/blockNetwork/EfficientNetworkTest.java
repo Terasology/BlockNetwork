@@ -43,6 +43,10 @@ public class EfficientNetworkTest {
         return new NetworkNode(location, sides);
     }
 
+    private NetworkNode toNode(Vector3i location, byte inputSides, byte outputSides) {
+        return new NetworkNode(location, inputSides, outputSides);
+    }
+
     @Test
     public void addNetworkingNodeToEmptyNetwork() {
         assertTrue(network.canAddNetworkingNode(toNode(new Vector3i(0, 0, 0), allDirections)));

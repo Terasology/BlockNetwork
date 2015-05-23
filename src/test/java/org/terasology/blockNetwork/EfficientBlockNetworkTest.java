@@ -21,6 +21,7 @@ import com.google.common.collect.Sets;
 import org.junit.Before;
 import org.junit.Test;
 import org.terasology.math.Side;
+import org.terasology.math.SideBitFlag;
 import org.terasology.math.geom.Vector3i;
 
 import java.util.Set;
@@ -229,6 +230,39 @@ public class EfficientBlockNetworkTest {
         assertEquals(4, network.getDistance(leftRight, frontBack, Integer.MAX_VALUE));
     }
 
+    @Test
+    public void networkingNodesNotConnectingIfInputOutputConflict() {
+        blockNetwork.addNetworkingBlock(new NetworkNode(new Vector3i(0, 0, 0), allDirections, (byte) 0), NetworkChangeReason.WORLD_CHANGE);
+        blockNetwork.addNetworkingBlock(new NetworkNode(new Vector3i(0, 0, 1), allDirections, (byte) 0), NetworkChangeReason.WORLD_CHANGE);
+
+        assertEquals(2, blockNetwork.getNetworks().size());
+        listener.validateNumbers(2, 0, 0, 0, 0, 0);
+    }
+
+    @Test
+    public void networkingNodesConnectingWithCorrectInputOutput() {
+        blockNetwork.addNetworkingBlock(new NetworkNode(new Vector3i(0, 0, 0), allDirections, (byte) 0), NetworkChangeReason.WORLD_CHANGE);
+        blockNetwork.addNetworkingBlock(new NetworkNode(new Vector3i(0, 0, 1), (byte) 0, allDirections), NetworkChangeReason.WORLD_CHANGE);
+
+        assertEquals(1, blockNetwork.getNetworks().size());
+        listener.validateNumbers(1, 0, 1, 0, 0, 0);
+    }
+
+    @Test
+    public void networkingNodesDistanceWithInputOutput() {
+        NetworkNode startBlock = new NetworkNode(new Vector3i(0, 0, 0), (byte) 0, allDirections);
+        NetworkNode endBlock = new NetworkNode(new Vector3i(0, 1, 0), SideBitFlag.getSide(Side.FRONT), SideBitFlag.getSides(Side.BACK, Side.LEFT, Side.RIGHT, Side.TOP, Side.BOTTOM));
+
+        blockNetwork.addNetworkingBlock(startBlock, NetworkChangeReason.WORLD_CHANGE);
+        blockNetwork.addNetworkingBlock(new NetworkNode(new Vector3i(0, 0, 1), allDirections, allDirections), NetworkChangeReason.WORLD_CHANGE);
+        blockNetwork.addNetworkingBlock(new NetworkNode(new Vector3i(0, 1, 1), allDirections, allDirections), NetworkChangeReason.WORLD_CHANGE);
+        blockNetwork.addNetworkingBlock(endBlock, NetworkChangeReason.WORLD_CHANGE);
+
+        assertEquals(1, blockNetwork.getNetworks().size());
+        Network<NetworkNode> network = blockNetwork.getNetworks().iterator().next();
+        assertEquals(3, network.getDistance(startBlock, endBlock, Integer.MAX_VALUE));
+    }
+
     private class TestListenerEfficient implements EfficientNetworkTopologyListener<NetworkNode> {
         private int networksAdded;
         private int networksRemoved;
@@ -290,12 +324,12 @@ public class EfficientBlockNetworkTest {
 
         public void validateNumbers(int networksAddedExpected, int networksRemovedExpected, int networkingNodesAddedExpected, int networkingNodesRemovedExpected,
                                     int leafNodesAddedExpected, int leafNodesRemovedExpected) {
-            assertEquals(networksAddedExpected, networksAdded);
-            assertEquals(networksRemovedExpected, networksRemoved);
-            assertEquals(networkingNodesAddedExpected, networkingNodesAdded);
-            assertEquals(networkingNodesRemovedExpected, networkingNodesRemoved);
-            assertEquals(leafNodesAddedExpected, leafNodesAdded);
-            assertEquals(leafNodesRemovedExpected, leafNodesRemoved);
+            assertEquals("Networks added", networksAddedExpected, networksAdded);
+            assertEquals("Networks removed", networksRemovedExpected, networksRemoved);
+            assertEquals("Networking nodes added", networkingNodesAddedExpected, networkingNodesAdded);
+            assertEquals("Networking nodes removed", networkingNodesRemovedExpected, networkingNodesRemoved);
+            assertEquals("Leaf nodes added", leafNodesAddedExpected, leafNodesAdded);
+            assertEquals("Leaf nodes removed", leafNodesRemovedExpected, leafNodesRemoved);
         }
     }
 

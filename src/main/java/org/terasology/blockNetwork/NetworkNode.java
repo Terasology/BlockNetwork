@@ -22,10 +22,21 @@ import org.terasology.math.geom.Vector3i;
 public class NetworkNode {
     public final ImmutableBlockLocation location;
     public final byte connectionSides;
+    public final byte inputSides;
+    public final byte outputSides;
 
     public NetworkNode(Vector3i location, byte connectionSides) {
+        this(location, connectionSides, connectionSides);
+    }
+
+    public NetworkNode(Vector3i location, byte inputSides, byte outputSides) {
+        if (inputSides > 63 || inputSides < 0 || outputSides > 63 || outputSides < 0) {
+            throw new IllegalArgumentException("Connection sides has to be in the 0-63 range");
+        }
         this.location = new ImmutableBlockLocation(location.x, location.y, location.z);
-        this.connectionSides = connectionSides;
+        this.connectionSides = (byte) (inputSides | outputSides);
+        this.inputSides = inputSides;
+        this.outputSides = outputSides;
     }
 
     public NetworkNode(Vector3i location, Side... sides) {
@@ -34,21 +45,14 @@ public class NetworkNode {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
         NetworkNode that = (NetworkNode) o;
 
-        if (connectionSides != that.connectionSides) {
-            return false;
-        }
-        if (location != null ? !location.equals(that.location) : that.location != null) {
-            return false;
-        }
+        if (inputSides != that.inputSides) return false;
+        if (outputSides != that.outputSides) return false;
+        if (location != null ? !location.equals(that.location) : that.location != null) return false;
 
         return true;
     }
@@ -56,7 +60,8 @@ public class NetworkNode {
     @Override
     public int hashCode() {
         int result = location != null ? location.hashCode() : 0;
-        result = 31 * result + (int) connectionSides;
+        result = 31 * result + (int) inputSides;
+        result = 31 * result + (int) outputSides;
         return result;
     }
 

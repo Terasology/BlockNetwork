@@ -235,9 +235,15 @@ public class EfficientNetwork<T extends NetworkNode> implements Network2<T> {
     }
 
     public static boolean areNodesConnecting(NetworkNode node1, NetworkNode node2) {
-        for (Side side : SideBitFlag.getSides(node1.connectionSides)) {
+        for (Side side : SideBitFlag.getSides(node1.inputSides)) {
             final ImmutableBlockLocation possibleConnectedLocation = node1.location.move(side);
-            if (node2.location.equals(possibleConnectedLocation) && SideBitFlag.hasSide(node2.connectionSides, side.reverse())) {
+            if (node2.location.equals(possibleConnectedLocation) && SideBitFlag.hasSide(node2.outputSides, side.reverse())) {
+                return true;
+            }
+        }
+        for (Side side : SideBitFlag.getSides(node1.outputSides)) {
+            final ImmutableBlockLocation possibleConnectedLocation = node1.location.move(side);
+            if (node2.location.equals(possibleConnectedLocation) && SideBitFlag.hasSide(node2.inputSides, side.reverse())) {
                 return true;
             }
         }
@@ -272,10 +278,18 @@ public class EfficientNetwork<T extends NetworkNode> implements Network2<T> {
     }
 
     private boolean canConnectToNetworkingNode(T networkNode) {
-        for (Side connectingOnSide : SideBitFlag.getSides(networkNode.connectionSides)) {
+        for (Side connectingOnSide : SideBitFlag.getSides(networkNode.inputSides)) {
             final ImmutableBlockLocation possibleConnectionLocation = networkNode.location.move(connectingOnSide);
             for (NetworkNode possibleConnectedNode : networkingNodes.get(possibleConnectionLocation)) {
-                if (SideBitFlag.hasSide(possibleConnectedNode.connectionSides, connectingOnSide.reverse())) {
+                if (SideBitFlag.hasSide(possibleConnectedNode.outputSides, connectingOnSide.reverse())) {
+                    return true;
+                }
+            }
+        }
+        for (Side connectingOnSide : SideBitFlag.getSides(networkNode.outputSides)) {
+            final ImmutableBlockLocation possibleConnectionLocation = networkNode.location.move(connectingOnSide);
+            for (NetworkNode possibleConnectedNode : networkingNodes.get(possibleConnectionLocation)) {
+                if (SideBitFlag.hasSide(possibleConnectedNode.inputSides, connectingOnSide.reverse())) {
                     return true;
                 }
             }
@@ -314,7 +328,7 @@ public class EfficientNetwork<T extends NetworkNode> implements Network2<T> {
             return 0;
         }
 
-        if (SimpleNetwork.areNodesConnecting(from, to)) {
+        if (EfficientNetwork.areNodesConnecting(from, to)) {
             return 1;
         }
 
@@ -328,7 +342,7 @@ public class EfficientNetwork<T extends NetworkNode> implements Network2<T> {
                             return TraversalResult.returnResult(-1);
                         }
 
-                        if (SimpleNetwork.areNodesConnecting(node, to)) {
+                        if (EfficientNetwork.areNodesConnecting(node, to)) {
                             distanceCache.put(
                                     new TwoNetworkNodes(from, to),
                                     distance);
@@ -362,7 +376,7 @@ public class EfficientNetwork<T extends NetworkNode> implements Network2<T> {
             return Arrays.asList(from);
         }
 
-        if (SimpleNetwork.areNodesConnecting(from, to)) {
+        if (EfficientNetwork.areNodesConnecting(from, to)) {
             return Arrays.asList(from, to);
         }
 
@@ -370,7 +384,7 @@ public class EfficientNetwork<T extends NetworkNode> implements Network2<T> {
                 new BreadthFirstTraversalWithPath<T, List<T>, Void>() {
                     @Override
                     public TraversalResult<T, List<T>, Void> visitNode(T node, Void parentValue, List<T> path) {
-                        if (SimpleNetwork.areNodesConnecting(node, to)) {
+                        if (EfficientNetwork.areNodesConnecting(node, to)) {
                             List<T> route = new LinkedList<>(path);
                             route.add(to);
 
@@ -399,11 +413,21 @@ public class EfficientNetwork<T extends NetworkNode> implements Network2<T> {
 
         if (networkingNodes.size() == 0) {
             // Degenerated network
-            for (Side connectingOnSide : SideBitFlag.getSides(networkNode.connectionSides)) {
+            for (Side connectingOnSide : SideBitFlag.getSides(networkNode.inputSides)) {
                 Vector3i possibleLocation = networkNode.location.toVector3i();
                 possibleLocation.add(connectingOnSide.getVector3i());
                 for (NetworkNode node : leafNodes.get(new ImmutableBlockLocation(possibleLocation))) {
-                    if (SideBitFlag.hasSide(node.connectionSides, connectingOnSide.reverse())) {
+                    if (SideBitFlag.hasSide(node.outputSides, connectingOnSide.reverse())) {
+                        return SideBitFlag.getSide(connectingOnSide);
+                    }
+                }
+            }
+
+            for (Side connectingOnSide : SideBitFlag.getSides(networkNode.outputSides)) {
+                Vector3i possibleLocation = networkNode.location.toVector3i();
+                possibleLocation.add(connectingOnSide.getVector3i());
+                for (NetworkNode node : leafNodes.get(new ImmutableBlockLocation(possibleLocation))) {
+                    if (SideBitFlag.hasSide(node.inputSides, connectingOnSide.reverse())) {
                         return SideBitFlag.getSide(connectingOnSide);
                     }
                 }
@@ -412,11 +436,20 @@ public class EfficientNetwork<T extends NetworkNode> implements Network2<T> {
             return 0;
         } else {
             byte result = 0;
-            for (Side connectingOnSide : SideBitFlag.getSides(networkNode.connectionSides)) {
+            for (Side connectingOnSide : SideBitFlag.getSides(networkNode.outputSides)) {
                 Vector3i possibleLocation = networkNode.location.toVector3i();
                 possibleLocation.add(connectingOnSide.getVector3i());
                 for (NetworkNode node : networkingNodes.get(new ImmutableBlockLocation(possibleLocation))) {
-                    if (SideBitFlag.hasSide(node.connectionSides, connectingOnSide.reverse())) {
+                    if (SideBitFlag.hasSide(node.inputSides, connectingOnSide.reverse())) {
+                        result += SideBitFlag.getSide(connectingOnSide);
+                    }
+                }
+            }
+            for (Side connectingOnSide : SideBitFlag.getSides(networkNode.inputSides)) {
+                Vector3i possibleLocation = networkNode.location.toVector3i();
+                possibleLocation.add(connectingOnSide.getVector3i());
+                for (NetworkNode node : networkingNodes.get(new ImmutableBlockLocation(possibleLocation))) {
+                    if (SideBitFlag.hasSide(node.outputSides, connectingOnSide.reverse())) {
                         result += SideBitFlag.getSide(connectingOnSide);
                     }
                 }
@@ -508,10 +541,10 @@ public class EfficientNetwork<T extends NetworkNode> implements Network2<T> {
             T node = nodeEntry.getKey();
             TraversalParams<T, V> params = nodeEntry.getValue();
 
-            for (Side connectingOnSide : SideBitFlag.getSides(node.connectionSides)) {
+            for (Side connectingOnSide : SideBitFlag.getSides(node.outputSides)) {
                 final ImmutableBlockLocation possibleConnectionLocation = node.location.move(connectingOnSide);
                 for (T possibleConnection : networkingNodes.get(possibleConnectionLocation)) {
-                    if (!visitedNodes.containsKey(possibleConnection) && SideBitFlag.hasSide(possibleConnection.connectionSides, connectingOnSide.reverse())
+                    if (!visitedNodes.containsKey(possibleConnection) && SideBitFlag.hasSide(possibleConnection.inputSides, connectingOnSide.reverse())
                             && params.predicate.apply(possibleConnection)) {
                         List<T> path = Lists.newLinkedList(visitedNodes.get(node));
                         path.add(possibleConnection);
@@ -531,10 +564,10 @@ public class EfficientNetwork<T extends NetworkNode> implements Network2<T> {
             NetworkNode node = nodeEntry.getKey();
             TraversalParams<T, V> params = nodeEntry.getValue();
 
-            for (Side connectingOnSide : SideBitFlag.getSides(node.connectionSides)) {
+            for (Side connectingOnSide : SideBitFlag.getSides(node.outputSides)) {
                 final ImmutableBlockLocation possibleConnectionLocation = node.location.move(connectingOnSide);
                 for (T possibleConnection : networkingNodes.get(possibleConnectionLocation)) {
-                    if (!visitedNodes.contains(possibleConnection) && SideBitFlag.hasSide(possibleConnection.connectionSides, connectingOnSide.reverse())
+                    if (!visitedNodes.contains(possibleConnection) && SideBitFlag.hasSide(possibleConnection.inputSides, connectingOnSide.reverse())
                             && params.predicate.apply(possibleConnection)) {
                         result.add(new TraversalData<T, V>(possibleConnection, params.value));
                     }

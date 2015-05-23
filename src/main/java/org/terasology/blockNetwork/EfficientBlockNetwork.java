@@ -237,7 +237,7 @@ public class EfficientBlockNetwork<T extends NetworkNode> {
 
         // Check for new degenerated networks
         for (T leafNode : leafNodes.values()) {
-            if (SimpleNetwork.areNodesConnecting(networkNode, leafNode)) {
+            if (EfficientNetwork.areNodesConnecting(networkNode, leafNode)) {
                 EfficientNetwork<T> degenerateNetwork = EfficientNetwork.createLeafOnlyNetwork(networkNode, leafNode);
                 networks.add(degenerateNetwork);
                 notifyNetworkAdded(degenerateNetwork, reason);

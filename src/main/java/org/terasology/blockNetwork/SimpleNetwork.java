@@ -44,7 +44,10 @@ import java.util.Set;
  * 1. The same node (defined as location) cannot be both a networking node and a leaf node in the same network.
  * 2. The same leaf node can be a member of multiple disjunctive networks (different network on each side).
  * 3. A valid network can have no networking nodes at all, and exactly two leaf nodes (neighbouring leaf nodes).
+ *
+ * @deprecated Use EfficientNetwork, this class will be removed.
  */
+@Deprecated
 public class SimpleNetwork<T extends NetworkNode> implements Network<T> {
     private static final boolean SANITY_CHECK = false;
     private SetMultimap<ImmutableBlockLocation, T> networkingNodes = HashMultimap.create();
