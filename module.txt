@@ -1,6 +1,6 @@
 {
     "id" : "BlockNetwork",
-    "version" : "0.1.0",
+    "version" : "0.1.1-SNAPSHOT",
     "author" : "Marcin Sciesinski <marcins78@gmail.com>",
     "displayName" : "Block Networks",
     "description" : "Library module that adds functionality of grouping blocks into networks",
