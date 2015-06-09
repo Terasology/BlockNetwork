@@ -4,6 +4,10 @@
     "author" : "Marcin Sciesinski <marcins78@gmail.com>",
     "displayName" : "Block Networks",
     "description" : "Library module that adds functionality of grouping blocks into networks",
-    "dependencies" : [],
+    "dependencies" : [
+        {
+            "id" : "MarcinScIncubator",
+            "minVersion" : "0.1.0"
+        }],
     "isServerSideOnly" : false
 }
