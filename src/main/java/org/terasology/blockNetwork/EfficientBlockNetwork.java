@@ -18,6 +18,7 @@ package org.terasology.blockNetwork;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+import org.terasology.math.geom.ImmutableVector3i;
 import org.terasology.math.geom.Vector3i;
 
 import java.util.Collection;
@@ -28,8 +29,8 @@ import java.util.Set;
 
 public class EfficientBlockNetwork<T extends NetworkNode> {
     private Set<EfficientNetwork<T>> networks = Sets.newHashSet();
-    private Multimap<ImmutableBlockLocation, T> leafNodes = HashMultimap.create();
-    private Multimap<ImmutableBlockLocation, T> networkingNodes = HashMultimap.create();
+    private Multimap<ImmutableVector3i, T> leafNodes = HashMultimap.create();
+    private Multimap<ImmutableVector3i, T> networkingNodes = HashMultimap.create();
 
     private Set<EfficientNetworkTopologyListener<T>> listeners = new HashSet<>();
 
@@ -48,11 +49,11 @@ public class EfficientBlockNetwork<T extends NetworkNode> {
     }
 
     public Collection<T> getLeafNodesAt(Vector3i location) {
-        return leafNodes.get(new ImmutableBlockLocation(location));
+        return leafNodes.get(new ImmutableVector3i(location));
     }
 
     public Collection<T> getNetworkingNodesAt(Vector3i location) {
-        return networkingNodes.get(new ImmutableBlockLocation(location));
+        return networkingNodes.get(new ImmutableVector3i(location));
     }
 
     public boolean containsLeafNode(T node) {

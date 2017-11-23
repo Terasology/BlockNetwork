@@ -17,10 +17,11 @@ package org.terasology.blockNetwork;
 
 import org.terasology.math.Side;
 import org.terasology.math.SideBitFlag;
+import org.terasology.math.geom.ImmutableVector3i;
 import org.terasology.math.geom.Vector3i;
 
 public class NetworkNode {
-    public final ImmutableBlockLocation location;
+    public final ImmutableVector3i location;
     public final byte connectionSides;
     public final byte inputSides;
     public final byte outputSides;
@@ -49,7 +50,7 @@ public class NetworkNode {
         if (inputSides > 63 || inputSides < 0 || outputSides > 63 || outputSides < 0) {
             throw new IllegalArgumentException("Connection sides has to be in the 0-63 range");
         }
-        this.location = new ImmutableBlockLocation(location.x, location.y, location.z);
+        this.location = new ImmutableVector3i(location.x, location.y, location.z);
         this.connectionSides = (byte) (inputSides | outputSides);
         this.inputSides = inputSides;
         this.outputSides = outputSides;
@@ -79,6 +80,6 @@ public class NetworkNode {
 
     @Override
     public String toString() {
-        return location.toVector3i().toString() + " " + connectionSides;
+        return location.toString() + " " + connectionSides;
     }
 }

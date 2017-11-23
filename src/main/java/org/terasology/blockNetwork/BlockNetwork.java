@@ -19,6 +19,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+import org.terasology.math.geom.ImmutableVector3i;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -34,8 +35,8 @@ import java.util.Set;
 @Deprecated
 public class BlockNetwork<T extends NetworkNode> {
     private Set<SimpleNetwork<T>> networks = Sets.newHashSet();
-    private Multimap<ImmutableBlockLocation, T> leafNodes = HashMultimap.create();
-    private Multimap<ImmutableBlockLocation, T> networkingNodes = HashMultimap.create();
+    private Multimap<ImmutableVector3i, T> leafNodes = HashMultimap.create();
+    private Multimap<ImmutableVector3i, T> networkingNodes = HashMultimap.create();
 
     private Set<NetworkTopologyListener<T>> listeners = new HashSet<>();
 
