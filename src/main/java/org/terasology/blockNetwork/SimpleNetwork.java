@@ -21,6 +21,7 @@ import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 import org.terasology.math.Side;
 import org.terasology.math.SideBitFlag;
+import org.terasology.math.geom.ImmutableVector3i;
 import org.terasology.math.geom.Vector3i;
 
 import java.util.Arrays;
@@ -50,8 +51,8 @@ import java.util.Set;
 @Deprecated
 public class SimpleNetwork<T extends NetworkNode> implements Network<T> {
     private static final boolean SANITY_CHECK = false;
-    private SetMultimap<ImmutableBlockLocation, T> networkingNodes = HashMultimap.create();
-    private SetMultimap<ImmutableBlockLocation, T> leafNodes = HashMultimap.create();
+    private SetMultimap<ImmutableVector3i, T> networkingNodes = HashMultimap.create();
+    private SetMultimap<ImmutableVector3i, T> leafNodes = HashMultimap.create();
 
     // Distance cache
     private Map<TwoNetworkNodes, Integer> distanceCache = Maps.newHashMap();
@@ -162,7 +163,7 @@ public class SimpleNetwork<T extends NetworkNode> implements Network<T> {
 
     public static boolean areNodesConnecting(NetworkNode node1, NetworkNode node2) {
         for (Side side : SideBitFlag.getSides(node1.connectionSides)) {
-            final ImmutableBlockLocation possibleConnectedLocation = node1.location.move(side);
+            final ImmutableVector3i possibleConnectedLocation = node1.location.add(side.getVector3i());
             if (node2.location.equals(possibleConnectedLocation) && SideBitFlag.hasSide(node2.connectionSides, side.reverse())) {
                 return true;
             }
@@ -199,7 +200,7 @@ public class SimpleNetwork<T extends NetworkNode> implements Network<T> {
 
     private boolean canConnectToNetworkingNode(T networkNode) {
         for (Side connectingOnSide : SideBitFlag.getSides(networkNode.connectionSides)) {
-            final ImmutableBlockLocation possibleConnectionLocation = networkNode.location.move(connectingOnSide);
+            final ImmutableVector3i possibleConnectionLocation = networkNode.location.add(connectingOnSide.getVector3i());
             for (NetworkNode possibleConnectedNode : networkingNodes.get(possibleConnectionLocation)) {
                 if (SideBitFlag.hasSide(possibleConnectedNode.connectionSides, connectingOnSide.reverse())) {
                     return true;
@@ -281,7 +282,7 @@ public class SimpleNetwork<T extends NetworkNode> implements Network<T> {
     public int getDistanceWithSide(T from, T to, Side toSide, int maxToSearch) {
         validateAnyOfTheNodesInNetwork(from, to);
 
-        NetworkNode destination = new NetworkNode(to.location.toVector3i(), toSide);
+        NetworkNode destination = new NetworkNode(new Vector3i(to.location), toSide);
         return getDistanceInternal(from, destination, maxToSearch);
     }
 
@@ -349,9 +350,9 @@ public class SimpleNetwork<T extends NetworkNode> implements Network<T> {
         if (networkingNodes.size() == 0) {
             // Degenerated network
             for (Side connectingOnSide : SideBitFlag.getSides(networkNode.connectionSides)) {
-                Vector3i possibleLocation = networkNode.location.toVector3i();
+                Vector3i possibleLocation = new Vector3i(networkNode.location);
                 possibleLocation.add(connectingOnSide.getVector3i());
-                for (NetworkNode node : leafNodes.get(new ImmutableBlockLocation(possibleLocation))) {
+                for (NetworkNode node : leafNodes.get(new ImmutableVector3i(possibleLocation))) {
                     if (SideBitFlag.hasSide(node.connectionSides, connectingOnSide.reverse())) {
                         return SideBitFlag.getSide(connectingOnSide);
                     }
@@ -362,9 +363,9 @@ public class SimpleNetwork<T extends NetworkNode> implements Network<T> {
         } else {
             byte result = 0;
             for (Side connectingOnSide : SideBitFlag.getSides(networkNode.connectionSides)) {
-                Vector3i possibleLocation = networkNode.location.toVector3i();
+                Vector3i possibleLocation =  new Vector3i(networkNode.location);
                 possibleLocation.add(connectingOnSide.getVector3i());
-                for (NetworkNode node : networkingNodes.get(new ImmutableBlockLocation(possibleLocation))) {
+                for (NetworkNode node : networkingNodes.get(new ImmutableVector3i(possibleLocation))) {
                     if (SideBitFlag.hasSide(node.connectionSides, connectingOnSide.reverse())) {
                         result += SideBitFlag.getSide(connectingOnSide);
                     }
@@ -377,7 +378,7 @@ public class SimpleNetwork<T extends NetworkNode> implements Network<T> {
 
     private void listConnectedNotVisitedNetworkingNodes(Set<NetworkNode> visitedNodes, NetworkNode location, Collection<NetworkNode> result) {
         for (Side connectingOnSide : SideBitFlag.getSides(location.connectionSides)) {
-            final ImmutableBlockLocation possibleConnectionLocation = location.location.move(connectingOnSide);
+            final ImmutableVector3i possibleConnectionLocation = location.location.add(connectingOnSide.getVector3i());
             for (T possibleConnection : networkingNodes.get(possibleConnectionLocation)) {
                 if (!visitedNodes.contains(possibleConnection) && SideBitFlag.hasSide(possibleConnection.connectionSides, connectingOnSide.reverse())) {
                     result.add(possibleConnection);
@@ -388,7 +389,7 @@ public class SimpleNetwork<T extends NetworkNode> implements Network<T> {
 
     private void listConnectedNotVisitedNetworkingNodes(Map<T, List<T>> visitedNodes, T location, Map<T, List<T>> result) {
         for (Side connectingOnSide : SideBitFlag.getSides(location.connectionSides)) {
-            final ImmutableBlockLocation possibleConnectionLocation = location.location.move(connectingOnSide);
+            final ImmutableVector3i possibleConnectionLocation = location.location.add(connectingOnSide.getVector3i());
             for (T possibleConnection : networkingNodes.get(possibleConnectionLocation)) {
                 if (!visitedNodes.containsKey(possibleConnection) && SideBitFlag.hasSide(possibleConnection.connectionSides, connectingOnSide.reverse())) {
                     List<T> pathToNewNode = new LinkedList<>(visitedNodes.get(location));
