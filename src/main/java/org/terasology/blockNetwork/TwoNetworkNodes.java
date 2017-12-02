@@ -16,15 +16,14 @@
 package org.terasology.blockNetwork;
 
     /**
-    * Creates two network nodes, checks whether they are equal to each other or not, and 
-    * calculates the sum of the hashcodes of the locations of both nodes.
+    * Establishes the relationship between the locations of two network nodes.
     */
 public class TwoNetworkNodes {
     public final NetworkNode node1;
     public final NetworkNode node2;
     
     /**
-    * TwoNetWorkNodes constructor.
+    * Initiates a class with two established nodes.
     *
     * @param  node1 
     * @param  node2
@@ -33,14 +32,7 @@ public class TwoNetworkNodes {
         this.node1 = node1;
         this.node2 = node2;
     }
-    
-    /**
-    * Checks if two nodes are equal to each other.
-    *
-    * @param o  an object
-    * @return <code>true</code> if node1 and node2 are both equal to each other. Will return <code>false</code> if o 
-    * is null, o does not equal the class of this, or node 1 and node 2 are not equal
-    */
+   
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -56,11 +48,6 @@ public class TwoNetworkNodes {
                 || that.node1.equals(node2) && that.node2.equals(node1);
     }
 
-    /**
-    * Calculates the sum of the hashcodes of node 1 and node2.
-    *
-    * @return the sum of the hashcodes of the locations of node1 and node2 
-    */    
     @Override
     public int hashCode() {
         return node1.hashCode() + node2.hashCode();
