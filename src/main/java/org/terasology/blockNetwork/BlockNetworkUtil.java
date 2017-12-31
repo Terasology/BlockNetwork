@@ -26,11 +26,22 @@ public final class BlockNetworkUtil {
     private BlockNetworkUtil() {
     }
 
+    /**
+    * getResultSide
+    * @param block - the block
+    * @param definedSide - the definedSide
+    * @return a rotation of the definedSide
+    */
     public static Side getResultSide(Block block, Side definedSide) {
         Rotation rotation = getRotation(block);
         return rotation.rotate(definedSide);
     }
 
+    /**
+    * getRotation
+    * @param block - the block
+    * @return Rotation data of a block that used by getResultSide, getResultConnections, and getSourceConnections methods {@link #getResultSide, @link #getResultConnections, @link getSourceConnections}
+    */
     private static Rotation getRotation(Block block) {
         Rotation rotation = Rotation.none();
         BlockFamily blockFamily = block.getBlockFamily();
@@ -40,6 +51,12 @@ public final class BlockNetworkUtil {
         return rotation;
     }
 
+    /**
+    * getResultConnections
+    * @param block - the block
+    * @param definedSides - the definedSides
+    * @return a byte contains the amount of result connections of the block
+    */
     public static byte getResultConnections(Block block, byte definedSides) {
         Rotation rotation = getRotation(block);
 
@@ -51,6 +68,12 @@ public final class BlockNetworkUtil {
         return result;
     }
 
+    /**
+    * getSourceConnections
+    * @param block - the block
+    * @param connections - the connections
+    * @return a byte contains the amount of source connections of the block
+    */
     public static byte getSourceConnections(Block block, byte connections) {
         Rotation rotation = getRotation(block);
 
