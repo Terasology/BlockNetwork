@@ -19,10 +19,29 @@ import org.terasology.math.Side;
 import org.terasology.math.SideBitFlag;
 import org.terasology.math.geom.Vector3i;
 
+/**
+ * Represents a single node in a block network.
+ * Any instance of this class or its children can be used as a node in {@link EfficientNetwork}
+ */
 public class NetworkNode {
+    /**
+     * The location of the Node
+     */
     public final ImmutableBlockLocation location;
+    
+    /**
+     * Based on a combination of the input and output sides, i.e. any side that is an input, output, or both.
+     */
     public final byte connectionSides;
+    
+    /**
+     * Sides which can be used for input
+     */
     public final byte inputSides;
+    
+    /**
+     * Sides which can be used for output
+     */
     public final byte outputSides;
 
     /**
@@ -47,7 +66,6 @@ public class NetworkNode {
 
     /**
      * Creates a new node based on the given location and input/output sides.
-     * connectionSides represents a combination of the input and output sides, i.e. any side that is an input, output, or both.
      * @param location The location of the node
      * @param inputSides The sides which can be used for input
      * @param outputSides The sides which can be used for output
