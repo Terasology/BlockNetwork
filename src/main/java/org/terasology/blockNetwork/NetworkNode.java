@@ -24,24 +24,10 @@ import org.terasology.math.geom.Vector3i;
  * Any instance of this class or its children can be used as a node in {@link EfficientNetwork}
  */
 public class NetworkNode {
-    /**
-     * The location of the Node
-     */
     public final ImmutableBlockLocation location;
-    
-    /**
-     * Based on a combination of the input and output sides, i.e. any side that is an input, output, or both.
-     */
+    //This variable is created based on a combination of the input and output sides, i.e. it contains any side that is an input, output, or both.
     public final byte connectionSides;
-    
-    /**
-     * Sides which can be used for input
-     */
     public final byte inputSides;
-    
-    /**
-     * Sides which can be used for output
-     */
     public final byte outputSides;
 
     /**
@@ -82,9 +68,8 @@ public class NetworkNode {
     }
     
     /**
-     * Used for finding out whether or not two NetworkNodes are the same
-     * @param o The node being compared
-     * @return true only if the node being compared to has the same inputSides, outputSides, and location
+     * {@inheritDoc}
+     * Note that two Nodes are are considered equal only if the location, inputSides, and outputSides are the same
      */
     @Override
     public boolean equals(Object o) {
@@ -100,9 +85,6 @@ public class NetworkNode {
         return true;
     }
 
-    /**
-     * @return A unique number for every different NetworkNode
-     */
     @Override
     public int hashCode() {
         int result = location != null ? location.hashCode() : 0;
@@ -111,9 +93,6 @@ public class NetworkNode {
         return result;
     }
 
-    /**
-     * @return A String with the location as an ordered triple and connection sides in base 10
-     */
     @Override
     public String toString() {
         return location.toVector3i().toString() + " " + connectionSides;
