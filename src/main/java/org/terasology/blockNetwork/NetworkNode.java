@@ -19,8 +19,13 @@ import org.terasology.math.Side;
 import org.terasology.math.SideBitFlag;
 import org.terasology.math.geom.Vector3i;
 
+/**
+ * Represents a single node in a block network.
+ * Any instance of this class or its children can be used as a node in {@link EfficientNetwork}
+ */
 public class NetworkNode {
     public final ImmutableBlockLocation location;
+    //This variable is created based on a combination of the input and output sides, i.e. it contains any side that is an input, output, or both.
     public final byte connectionSides;
     public final byte inputSides;
     public final byte outputSides;
@@ -45,6 +50,13 @@ public class NetworkNode {
         this(location, SideBitFlag.getSides(sides));
     }
 
+    /**
+     * Creates a new node based on the given location and input/output sides.
+     * @param location The location of the node
+     * @param inputSides The sides which can be used for input
+     * @param outputSides The sides which can be used for output
+     * @throws IllegalArgumentException if the input or output sides don't represent the sides of a block (i.e., they are outside of the 0-63 range)
+     */
     public NetworkNode(Vector3i location, byte inputSides, byte outputSides) {
         if (inputSides > 63 || inputSides < 0 || outputSides > 63 || outputSides < 0) {
             throw new IllegalArgumentException("Connection sides has to be in the 0-63 range");
@@ -54,7 +66,11 @@ public class NetworkNode {
         this.inputSides = inputSides;
         this.outputSides = outputSides;
     }
-
+    
+    /**
+     * {@inheritDoc}
+     * Note that two Nodes are are considered equal only if the location, inputSides, and outputSides are the same
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
