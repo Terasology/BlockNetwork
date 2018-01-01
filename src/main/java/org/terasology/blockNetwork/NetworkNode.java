@@ -45,6 +45,14 @@ public class NetworkNode {
         this(location, SideBitFlag.getSides(sides));
     }
 
+    /**
+     * Creates a new node based on the given location and input/output sides.
+     * connectionSides represents a combination of the input and output sides, i.e. any side that is an input, output, or both.
+     * @param location The location of the node
+     * @param inputSides The sides which can be used for input
+     * @param outputSides The sides which can be used for output
+     * @throws IllegalArgumentException if the input or output sides don't represent the sides of a block (i.e., they are outside of the 0-63 range)
+     */
     public NetworkNode(Vector3i location, byte inputSides, byte outputSides) {
         if (inputSides > 63 || inputSides < 0 || outputSides > 63 || outputSides < 0) {
             throw new IllegalArgumentException("Connection sides has to be in the 0-63 range");
@@ -54,7 +62,12 @@ public class NetworkNode {
         this.inputSides = inputSides;
         this.outputSides = outputSides;
     }
-
+    
+    /**
+     * Used for finding out whether or not two NetworkNodes are the same
+     * @param o The node being compared
+     * @return true only if the node being compared to has the same inputSides, outputSides, and location
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -69,6 +82,9 @@ public class NetworkNode {
         return true;
     }
 
+    /**
+     * @return A unique number for every different NetworkNode
+     */
     @Override
     public int hashCode() {
         int result = location != null ? location.hashCode() : 0;
@@ -77,6 +93,9 @@ public class NetworkNode {
         return result;
     }
 
+    /**
+     * @return A String with the location as an ordered triple and connection sides in base 10
+     */
     @Override
     public String toString() {
         return location.toVector3i().toString() + " " + connectionSides;
