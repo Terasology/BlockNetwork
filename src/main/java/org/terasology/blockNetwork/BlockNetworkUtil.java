@@ -27,13 +27,13 @@ public final class BlockNetworkUtil {
     }
 
     /**
-    * getResultSide
-    * @param block - the block
-    * @param definedSide - the definedSide
-    * @return a side rotation of the definedSide
-    * This method's function is to get the side of a block that is rotated somehow. The rotation of the block
+    * Get the side of a block that is rotated somehow. The rotation of the block
     * is obtained from the getRotation Method ({@link #getRotation}) and then to get the Side data, the rotation data
     * is rotated to the defined side
+    *
+    * @param block - the block that is rotated
+    * @param definedSide - the definedSide to define which side of the rotated block to be returned
+    * @return a side rotation of the definedSide
     */
     public static Side getResultSide(Block block, Side definedSide) {
         Rotation rotation = getRotation(block);
@@ -41,11 +41,11 @@ public final class BlockNetworkUtil {
     }
 
     /**
-    * getRotation
-    * @param block - the block
-    * @return Rotation data of a block that used by getResultSide, getResultConnections, and getSourceConnections methods {@link #getResultSide, @link #getResultConnections, @link getSourceConnections}
     * This Rotation method refers to the RotationBlockFamily class to get the rotation of a block. If the blockfamily of the block has RotationBlockFamily in instance,
     * The method will return the rotation of the block. if not, it will return null
+    *
+    * @param block - the block that is going to be checked its' rotation
+    * @return Rotation data of a block that used by getResultSide, getResultConnections, and getSourceConnections methods {@link #getResultSide, @link #getResultConnections, @link getSourceConnections}
     */
     private static Rotation getRotation(Block block) {
         Rotation rotation = Rotation.none();
@@ -57,12 +57,12 @@ public final class BlockNetworkUtil {
     }
 
     /**
-    * getResultConnections
-    * @param block - the block
-    * @param definedSides - the definedSides
-    * @return a byte contains the amount of result connections of the block
     * This method is used to count the result connection of the block. the iteration of rotating the block in definedSides will increase the amount
     * of the connections
+    *
+    * @param block - the block that is about to be checked its' rotation and counted its' connections
+    * @param definedSides - the definedSides on which the loop iterates the sides of the block
+    * @return a byte contains the amount of result connections of the block
     */
     public static byte getResultConnections(Block block, byte definedSides) {
         Rotation rotation = getRotation(block);
@@ -76,13 +76,13 @@ public final class BlockNetworkUtil {
     }
 
     /**
-    * getSourceConnections
-    * @param block - the block
-    * @param connections - the connections
-    * @return a byte contains the amount of source connections of the block
     * This getSourceConnections method works almost similar to the getResultConnections method above. but, there's a different in the rotation var.
     * The rotation var in this method finds the reverse of the block rotation of a defined block. There is also a different at the loop in this method.
     * This method loops the sides of the connections defined as a parameter while the getResultConnections iterates from the definedSides.
+    *
+    * @param block - the block that is going to be checked
+    * @param connections - the connections from which the sides come from
+    * @return a byte contains the amount of source connections of the block
     */
     public static byte getSourceConnections(Block block, byte connections) {
         Rotation rotation = getRotation(block);
