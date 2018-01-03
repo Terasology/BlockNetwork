@@ -54,7 +54,7 @@ public final class BlockNetworkUtil {
     }
 
     /**
-    * Give the new side of the block based on its' rotation
+    * Give the new side of the block based on its rotation
     *
     * @param block the block whose rotation is to be checked and whose connection is to be counted
     * @param definedSides the definedSides on which the loop iterates the sides of the block
@@ -72,7 +72,7 @@ public final class BlockNetworkUtil {
     }
 
     /**
-    * Give the new reversed side of the block based on its' rotation
+    * Give the new reversed side of the block based on its rotation
     *
     * @param block the block to be checked
     * @param connections the connections from which the sides come from
