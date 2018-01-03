@@ -29,8 +29,8 @@ public final class BlockNetworkUtil {
     /**
     * Get the side of a block that is rotated based on the defined side
     *
-    * @param block - the block that is rotated
-    * @param definedSide - the definedSide to define which side of the rotated block to be returned
+    * @param block the block that is rotated
+    * @param definedSide the definedSide to define which side of the rotated block to be returned
     * @return a side rotation of the definedSide
     */
     public static Side getResultSide(Block block, Side definedSide) {
@@ -39,9 +39,9 @@ public final class BlockNetworkUtil {
     }
 
     /**
-    * Check is the block has RotationBlockFamily and return the rotation of the block if it does
+    * Check if the block has RotationBlockFamily and return the rotation of the block if it does
     *
-    * @param block - the block that is going to be checked its' rotation
+    * @param block the block that is going to be checked its' rotation
     * @return Rotation data of a block that used by getResultSide, getResultConnections, and getSourceConnections methods {@link #getResultSide, @link #getResultConnections, @link getSourceConnections}
     */
     private static Rotation getRotation(Block block) {
@@ -56,8 +56,8 @@ public final class BlockNetworkUtil {
     /**
     * Give the new side of the block based on its' rotation
     *
-    * @param block - the block that is about to be checked its' rotation and counted its' connections
-    * @param definedSides - the definedSides on which the loop iterates the sides of the block
+    * @param block the block that is about to be checked its' rotation and counted its' connections
+    * @param definedSides the definedSides on which the loop iterates the sides of the block
     * @return a byte of sides
     */
     public static byte getResultConnections(Block block, byte definedSides) {
@@ -74,8 +74,8 @@ public final class BlockNetworkUtil {
     /**
     * Give the new reversed side of the block based on its' rotation
     *
-    * @param block - the block that is going to be checked
-    * @param connections - the connections from which the sides come from
+    * @param block the block that is going to be checked
+    * @param connections the connections from which the sides come from
     * @return a byte of sides
     */
     public static byte getSourceConnections(Block block, byte connections) {
