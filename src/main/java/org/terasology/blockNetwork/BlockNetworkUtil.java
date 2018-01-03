@@ -27,7 +27,7 @@ public final class BlockNetworkUtil {
     }
 
     /**
-    * Get the side of a block that is rotated based on the defined side
+    * Gets the side of a block that is rotated based on the defined side
     *
     * @param block the block that is rotated
     * @param definedSide the definedSide to define which side of the rotated block to be returned
@@ -54,7 +54,7 @@ public final class BlockNetworkUtil {
     }
 
     /**
-    * Give the new sides of the block based on its rotation
+    * Gives the new sides of the block based on its rotation
     *
     * @param block the block whose rotation is to be checked and whose connection is to be counted
     * @param definedSides a byte of sides that are to be added to the result byte
@@ -72,7 +72,7 @@ public final class BlockNetworkUtil {
     }
 
     /**
-    * Give the new reversed sides of the block based on its rotation
+    * Gives the new reversed sides of the block based on its rotation
     *
     * @param block the block to be checked
     * @param connections a byte of connections that is to be added to the result byte
