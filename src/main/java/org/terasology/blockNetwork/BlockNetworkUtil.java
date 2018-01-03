@@ -41,7 +41,7 @@ public final class BlockNetworkUtil {
     /**
     * Check if the block has RotationBlockFamily and return the rotation of the block if it does
     *
-    * @param block the block that is going to be checked its' rotation
+    * @param block the block whose rotation is to be checked
     * @return Rotation data of a block that used by getResultSide, getResultConnections, and getSourceConnections methods {@link #getResultSide, @link #getResultConnections, @link getSourceConnections}
     */
     private static Rotation getRotation(Block block) {
@@ -56,7 +56,7 @@ public final class BlockNetworkUtil {
     /**
     * Give the new side of the block based on its' rotation
     *
-    * @param block the block that is about to be checked its' rotation and counted its' connections
+    * @param block the block whose rotation is to be checked and whose connection is to be counted
     * @param definedSides the definedSides on which the loop iterates the sides of the block
     * @return a byte of sides
     */
@@ -74,7 +74,7 @@ public final class BlockNetworkUtil {
     /**
     * Give the new reversed side of the block based on its' rotation
     *
-    * @param block the block that is going to be checked
+    * @param block the block to be checked
     * @param connections the connections from which the sides come from
     * @return a byte of sides
     */
