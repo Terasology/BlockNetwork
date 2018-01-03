@@ -54,11 +54,11 @@ public final class BlockNetworkUtil {
     }
 
     /**
-    * Give the rotation of the block that has connections at defined sides
+    * Give the new side of the block based on its' rotation
     *
     * @param block - the block that is about to be checked its' rotation and counted its' connections
     * @param definedSides - the definedSides on which the loop iterates the sides of the block
-    * @return a rotation byte of connections
+    * @return a byte of sides
     */
     public static byte getResultConnections(Block block, byte definedSides) {
         Rotation rotation = getRotation(block);
@@ -72,11 +72,11 @@ public final class BlockNetworkUtil {
     }
 
     /**
-    * Give the rotation of the block that has connection at its' reversed sides
+    * Give the new reversed side of the block based on its' rotation
     *
     * @param block - the block that is going to be checked
     * @param connections - the connections from which the sides come from
-    * @return a rotation byte of connections
+    * @return a byte of sides
     */
     public static byte getSourceConnections(Block block, byte connections) {
         Rotation rotation = getRotation(block);
