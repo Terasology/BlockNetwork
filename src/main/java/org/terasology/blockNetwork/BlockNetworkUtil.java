@@ -27,9 +27,7 @@ public final class BlockNetworkUtil {
     }
 
     /**
-    * Get the side of a block that is rotated somehow. The rotation of the block
-    * is obtained from the getRotation Method ({@link #getRotation}) and then to get the Side data, the rotation data
-    * is rotated to the defined side
+    * Get the side of a block that is rotated based on the defined side
     *
     * @param block - the block that is rotated
     * @param definedSide - the definedSide to define which side of the rotated block to be returned
@@ -41,8 +39,7 @@ public final class BlockNetworkUtil {
     }
 
     /**
-    * This Rotation method refers to the RotationBlockFamily class to get the rotation of a block. If the blockfamily of the block has RotationBlockFamily in instance,
-    * The method will return the rotation of the block. if not, it will return null
+    * Check is the block has RotationBlockFamily and return the rotation of the block if it does
     *
     * @param block - the block that is going to be checked its' rotation
     * @return Rotation data of a block that used by getResultSide, getResultConnections, and getSourceConnections methods {@link #getResultSide, @link #getResultConnections, @link getSourceConnections}
@@ -57,8 +54,7 @@ public final class BlockNetworkUtil {
     }
 
     /**
-    * This method is used to count the result connection of the block. the iteration of rotating the block in definedSides will increase the amount
-    * of the connections
+    * Count the connection of the block that is rotated based on defined sides
     *
     * @param block - the block that is about to be checked its' rotation and counted its' connections
     * @param definedSides - the definedSides on which the loop iterates the sides of the block
@@ -76,9 +72,7 @@ public final class BlockNetworkUtil {
     }
 
     /**
-    * This getSourceConnections method works almost similar to the getResultConnections method above. but, there's a different in the rotation var.
-    * The rotation var in this method finds the reverse of the block rotation of a defined block. There is also a different at the loop in this method.
-    * This method loops the sides of the connections defined as a parameter while the getResultConnections iterates from the definedSides.
+    * Count the connection of the block that is reversedly rotated based on connections
     *
     * @param block - the block that is going to be checked
     * @param connections - the connections from which the sides come from
