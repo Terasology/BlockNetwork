@@ -26,6 +26,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+/**
+ * A class that manages the creation, removal, merging, and splitting of networks of connected blocks.
+ *
+ * @param <T> The type of node in this network.
+ */
 public class EfficientBlockNetwork<T extends NetworkNode> {
     private Set<EfficientNetwork<T>> networks = Sets.newHashSet();
     private Multimap<ImmutableBlockLocation, T> leafNodes = HashMultimap.create();
@@ -35,34 +40,86 @@ public class EfficientBlockNetwork<T extends NetworkNode> {
 
     private boolean mutating;
 
+    /**
+     * Adds a given listener to the listeners to be notified of topology events of this network.
+     * <p>
+     * Listeners are notified when nodes are added or removed, and when networks are added, removed, split, or merged.
+     * If the given listener is equal to one already added, attempting to add it again does nothing.
+     *
+     * @param listener The listener to add.
+     * @see EfficientNetworkTopologyListener
+     */
     public void addTopologyListener(EfficientNetworkTopologyListener<T> listener) {
         listeners.add(listener);
     }
 
+    /**
+     * Removes a given listener from the listeners to be notified of topology events of this network.
+     *
+     * @param listener The listener to remove.
+     */
     public void removeTopologyListener(EfficientNetworkTopologyListener<T> listener) {
         listeners.remove(listener);
     }
 
+    /**
+     * Adds a given networking block to this network.
+     *
+     * @param networkNode The networking block to add.
+     * @param reason The reason for addition.
+     * @throws IllegalArgumentException if the networking block shares a connection side with a networking block in this network.
+     */
     public void addNetworkingBlock(T networkNode, NetworkChangeReason reason) {
         addNetworkingBlocks(Collections.singleton(networkNode), reason);
     }
 
+    /**
+     * Gets the leaf nodes at a given location.
+     *
+     * @param location The location to query.
+     * @return A collection of leaf nodes at <code>location</code>.
+     */
     public Collection<T> getLeafNodesAt(Vector3i location) {
         return leafNodes.get(new ImmutableBlockLocation(location));
     }
 
+    /**
+     * Gets the networking nodes at a given location.
+     *
+     * @param location The location to query.
+     * @return A collection of leaf nodes at <code>location</code>.
+     */
     public Collection<T> getNetworkingNodesAt(Vector3i location) {
         return networkingNodes.get(new ImmutableBlockLocation(location));
     }
 
+    /**
+     * Checks if this block network contains a given leaf node.
+     *
+     * @param node The node to check.
+     * @return true if <code>node</code> is a leaf node in this block network, false otherwise.
+     */
     public boolean containsLeafNode(T node) {
         return leafNodes.containsValue(node);
     }
 
+    /**
+     * Checks if this block network contains a given networking node.
+     *
+     * @param node The node to check
+     * @return true if <code>node</code> is a networking node in this block network, false otherwise.
+     */
     public boolean containsNetworkingNode(T node) {
         return networkingNodes.containsValue(node);
     }
 
+    /**
+     * Adds a given collection of networking blocks to this network.
+     *
+     * @param networkNodes The collection of networking blocks to add.
+     * @param reason The reason for addition.
+     * @throws IllegalArgumentException if a networking block in <code>networkNodes</code> shares a connection side with a networking block in this network.
+     */
     public void addNetworkingBlocks(Collection<T> networkNodes, NetworkChangeReason reason) {
         validateNotMutating();
         mutating = true;
@@ -204,10 +261,24 @@ public class EfficientBlockNetwork<T extends NetworkNode> {
         return acceptingNetworks;
     }
 
+    /**
+     * Adds a given leaf block to this network.
+     *
+     * @param networkNode The leaf block to add.
+     * @param reason The reason for addition.
+     * @throws IllegalArgumentException if the leaf block shares a connection side with a leaf block in this network.
+     */
     public void addLeafBlock(T networkNode, NetworkChangeReason reason) {
         addLeafBlocks(Collections.singleton(networkNode), reason);
     }
 
+    /**
+     * Adds a given collection of leaf blocks to this network.
+     *
+     * @param networkNodes The collection of leaf blocks to add.
+     * @param reason The reason for addition.
+     * @throws IllegalArgumentException if a leaf block in <code>networkNodes</code> shares a connection side with a leaf block in this network.
+     */
     public void addLeafBlocks(Collection<T> networkNodes, NetworkChangeReason reason) {
         // No optimizations can be made here
         validateNotMutating();
@@ -245,10 +316,24 @@ public class EfficientBlockNetwork<T extends NetworkNode> {
         }
     }
 
+    /**
+     * Removes a given networking block from this network.
+     *
+     * @param networkNode The networking block to remove.
+     * @param reason The reason for removal.
+     * @throws IllegalArgumentException if <code>networkNode</code> is not in this block network.
+     */
     public void removeNetworkingBlock(T networkNode, NetworkChangeReason reason) {
         removeNetworkingBlocks(Collections.singleton(networkNode), reason);
     }
 
+    /**
+     * Removes a given collection of networking blocks from this network.
+     *
+     * @param networkNodes The collection of networking blocks to remove.
+     * @param reason The reason for removal.
+     * @throws IllegalArgumentException if a networking block in <code>networkNodes</code> is not in this block network.
+     */
     public void removeNetworkingBlocks(Collection<T> networkNodes, NetworkChangeReason reason) {
         if (networkNodes.size() == 0) {
             return;
@@ -292,10 +377,24 @@ public class EfficientBlockNetwork<T extends NetworkNode> {
         }
     }
 
+    /**
+     * Removes a given leaf block from this network.
+     *
+     * @param networkNode The leaf block to remove.
+     * @param reason The reason for removal.
+     * @throws IllegalArgumentException if <code>networkNode</code> is not in this block network.
+     */
     public void removeLeafBlock(T networkNode, NetworkChangeReason reason) {
         removeLeafBlocks(Collections.singleton(networkNode), reason);
     }
 
+    /**
+     * Removes a given collection of leaf blocks from this network.
+     *
+     * @param networkNodes The collection of leaf blocks to remove.
+     * @param reason The reason for removal.
+     * @throws IllegalArgumentException if a leaf block in <code>networkNodes</code> is not in this block network.
+     */
     public void removeLeafBlocks(Collection<T> networkNodes, NetworkChangeReason reason) {
         // No optimization can be made here
         validateNotMutating();
@@ -333,10 +432,21 @@ public class EfficientBlockNetwork<T extends NetworkNode> {
         }
     }
 
+    /**
+     * Gets underlying networks managed by this object.
+     *
+     * @return A collection of networks.
+     */
     public Collection<? extends Network2<T>> getNetworks() {
         return Collections.unmodifiableCollection(networks);
     }
 
+    /**
+     * Checks if a given network is managed by this object.
+     *
+     * @param network The network to check.
+     * @return true if <code>network</code> is a network managed by this object, false otherwise.
+     */
     public boolean isNetworkActive(Network2<T> network) {
         return networks.contains(network);
     }
@@ -350,6 +460,12 @@ public class EfficientBlockNetwork<T extends NetworkNode> {
         return null;
     }
 
+    /**
+     * Finds a network managed by this object that contains a given networking node as a node.
+     *
+     * @param networkNode The networking node to find the network of.
+     * @return The network that contains <code>networkNode</code> as a networking node, or null if no network managed by this object contains <code>networkNode</code> as a networking node.
+     */
     public Network2 getNetworkWithNetworkingBlock(T networkNode) {
         return findNetworkWithNetworkingBlock(networkNode);
     }

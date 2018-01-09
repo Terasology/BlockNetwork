@@ -18,9 +18,23 @@ package org.terasology.blockNetwork;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 
+/**
+ * Contains a block location immutably.
+ */
 public class ImmutableBlockLocation {
+    /**
+     * x-coordinate of the location.
+     */
     public final int x;
+
+    /**
+     * y-coordinate of the location.
+     */
     public final int y;
+
+    /**
+     * z-coordinate of the location.
+     */
     public final int z;
     
     public ImmutableBlockLocation(Vector3i location) {

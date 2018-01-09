@@ -15,6 +15,16 @@
  */
 package org.terasology.blockNetwork;
 
+/**
+ * Reason for a network topology change
+ */
 public enum NetworkChangeReason {
-    CHUNK_EVENT, WORLD_CHANGE
+    /**
+     * Unused.
+     */
+    CHUNK_EVENT,
+    /**
+     * A block that connects to a network was added to or removed from the world.
+     */
+    WORLD_CHANGE
 }

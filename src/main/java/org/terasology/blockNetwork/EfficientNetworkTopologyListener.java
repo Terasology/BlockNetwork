@@ -17,6 +17,11 @@ package org.terasology.blockNetwork;
 
 import java.util.Set;
 
+/**
+ * Listener class for topology changes in an {@link EfficientNetwork}.
+ *
+ * @param <T> The type of node in the network listened to.
+ */
 public interface EfficientNetworkTopologyListener<T extends NetworkNode> {
     /**
      * Called when network was added (with all the nodes within it).
