@@ -18,10 +18,33 @@ package org.terasology.blockNetwork.traversal;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 
+/**
+ * The result of a node traversal performed on a graph. It contains a flag to stop the traversal, a predicate for selecting consequent 
+ * nodes to be traversed, the returned result of the traversal, and the value propagated through the traversal.
+ * 
+ * @param <T> Type of nodes in the graph.
+ * @param <U> Return value type from the traversal.
+ * @param <V> Value passed from node visited into nodes that are outgoing from that node.
+ */
 public final class TraversalResult<T, U, V> {
+    /**
+     * A flag specifying whether to stop the traversal or not.
+     */
     public final boolean stopTraversal;
+    
+    /**
+     * The predicate that filters or selects the nodes that shall be traversed in the next step.
+     */
     public Predicate<T> predicate;
+    
+    /**
+     * The result of the node traversal.
+     */
     public final U result;
+    
+    /**
+     * The value propagated through the node traversal.
+     */
     public final V value;
 
     private TraversalResult(boolean stopTraversal, Predicate<T> predicate, U result, V value) {
