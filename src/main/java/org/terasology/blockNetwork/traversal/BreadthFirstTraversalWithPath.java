@@ -27,5 +27,14 @@ import java.util.List;
  * @param <V> Value passed from node visited into nodes that are outgoing from that node.
  */
 public interface BreadthFirstTraversalWithPath<T, U, V> {
+    /**
+     * Traverses the given node in the graph.
+     * This method is invoked for each node in a traversal as directed by the traversal definition and the traversal result.
+     * 
+     * @param node The type of nodes in the graph.
+     * @param parentValue The value passed from the parent node in the traversal into this node.
+     * @param path The traversal path from the start node up to the node currently being traversed.
+     * @return The result of the node traversal.
+     */
     TraversalResult<T, U, V> visitNode(T node, V parentValue, List<T> path);
 }
