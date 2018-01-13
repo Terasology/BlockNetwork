@@ -24,5 +24,13 @@ package org.terasology.blockNetwork.traversal;
  * @param <V> Value passed from node visited into nodes that are outgoing from that node.
  */
 public interface BreadthFirstTraversal<T, U, V> {
+    /**
+     * Traverses the given node in the graph.
+     * This method is invoked for each node in a traversal as directed by the traversal definition and the traversal result.
+     * 
+     * @param node The type of nodes in the graph.
+     * @param parentValue The value passed from the parent node in the traversal into this node.
+     * @return The result of the node traversal.
+     */
     TraversalResult<T, U, V> visitNode(T node, V parentValue);
 }
