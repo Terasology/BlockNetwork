@@ -28,7 +28,7 @@ public interface BreadthFirstTraversal<T, U, V> {
      * Traverses the given node in the graph.
      * This method is invoked for each node in a traversal as directed by the traversal definition and the traversal result.
      * 
-     * @param node The type of nodes in the graph.
+     * @param node The node to traverse.
      * @param parentValue The value passed from the parent node in the traversal into this node.
      * @return The result of the node traversal.
      */
