@@ -62,6 +62,14 @@ public class EfficientNetwork<T extends NetworkNode> implements Network2<T> {
     private Map<TwoNetworkNodes, Integer> distanceCache = Maps.newHashMap();
     private Map<TwoNetworkNodes, List<T>> shortestRouteCache = Maps.newHashMap();
 
+    /**
+     * Creates a network containing only two given nodes as leaves.
+     *
+     * @param networkNode1 The first node
+     * @param networkNode2 The second node
+     * @param <T> The type of the nodes
+     * @return A network containing the two nodes as leaves
+     */
     public static <T extends NetworkNode> EfficientNetwork<T> createLeafOnlyNetwork(
             T networkNode1,
             T networkNode2) {
@@ -75,6 +83,11 @@ public class EfficientNetwork<T extends NetworkNode> implements Network2<T> {
         return network;
     }
 
+    /**
+     * Checks if this network consists of only two leaves.
+     *
+     * @return true if this network has two leaves and no networking nodes, otherwise false.
+     */
     public boolean isTwoLeafNetwork() {
         return networkingNodes.size() == 0 && leafNodes.size() == 2;
     }
@@ -146,6 +159,14 @@ public class EfficientNetwork<T extends NetworkNode> implements Network2<T> {
         return null;
     }
 
+    /**
+     * Removes a given networking node from this network, potentially splitting the network.
+     *
+     * @param networkNode The node to remove.
+     * @return An object representing the result of the removal.
+     * @throws IllegalArgumentException if <code>networkNode</code> is not a networking node of this network.
+     * @see NetworkingNodeRemovalResult
+     */
     public NetworkingNodeRemovalResult<T> removeNetworkingNodeOrSplit(T networkNode) {
         if (!networkingNodes.containsEntry(networkNode.location, networkNode)) {
             throw new IllegalArgumentException("Tried to remove a node that is not in the network");
@@ -234,6 +255,13 @@ public class EfficientNetwork<T extends NetworkNode> implements Network2<T> {
         return Collections.unmodifiableCollection(leafNodes.values());
     }
 
+    /**
+     * Checks if two given nodes are directly connecting.
+     *
+     * @param node1 The first node
+     * @param node2 The second node
+     * @return true if the two nodes are directly connecting, output to input. Otherwise, false.
+     */
     public static boolean areNodesConnecting(NetworkNode node1, NetworkNode node2) {
         for (Side side : SideBitFlag.getSides(node1.inputSides)) {
             final ImmutableBlockLocation possibleConnectedLocation = node1.location.move(side);
@@ -266,6 +294,12 @@ public class EfficientNetwork<T extends NetworkNode> implements Network2<T> {
         return canConnectToNetworkingNode(networkNode);
     }
 
+    /**
+     * If this network can connect to node at the location specified with the specified connecting sides.
+     *
+     * @param networkNode Definition of the leaf node position and connecting sides.
+     * @return If the leaf node can be added to the network (connects to it).
+     */
     public boolean canAddLeafNode(T networkNode) {
         if (isEmptyNetwork()) {
             return false;
@@ -610,9 +644,23 @@ public class EfficientNetwork<T extends NetworkNode> implements Network2<T> {
         }
     }
 
+    /**
+     * Represents the result of a node removal from a network.
+     *
+     * @param <T> The type of nodes in the network being removed from.
+     */
     public static class NetworkingNodeRemovalResult<T extends NetworkNode> {
+        /**
+         * This removal removes the whole network
+         */
         public final boolean removesNetwork;
+        /**
+         * Leaf nodes this removal removes
+         */
         public final Set<T> removedLeafNodes;
+        /**
+         * Set of networks this removal splits the network into
+         */
         public final Set<EfficientNetwork<T>> splitResult;
 
         private NetworkingNodeRemovalResult(boolean removesNetwork, Set<T> removedLeafNodes, Set<EfficientNetwork<T>> splitResult) {
@@ -621,14 +669,34 @@ public class EfficientNetwork<T extends NetworkNode> implements Network2<T> {
             this.splitResult = splitResult;
         }
 
+        /**
+         * Create a removal result that represents removal of the whole network.
+         *
+         * @param <T> The type of nodes in the network being removed from.
+         * @return A new removal result
+         */
         public static <T extends NetworkNode> NetworkingNodeRemovalResult<T> removeNetwork() {
             return new NetworkingNodeRemovalResult<>(true, null, null);
         }
 
+        /**
+         * Create a removal result that represents the removal of a given set of leaf nodes.
+         *
+         * @param removedLeafNodes The leaf nodes that were removed from the network.
+         * @param <T> The type of nodes in the network being removed from.
+         * @return A new removal result
+         */
         public static <T extends NetworkNode> NetworkingNodeRemovalResult<T> removeLeafNodes(Set<T> removedLeafNodes) {
             return new NetworkingNodeRemovalResult<>(false, removedLeafNodes, null);
         }
 
+        /**
+         * Create a removal result that represents a removal that splits a network into the given set of networks.
+         *
+         * @param splitResult The set of networks the removal splits the original network into.
+         * @param <T> The type of nodes in the network being removed from.
+         * @return A new removal result
+         */
         public static <T extends NetworkNode> NetworkingNodeRemovalResult<T> splitNetwork(Set<EfficientNetwork<T>> splitResult) {
             return new NetworkingNodeRemovalResult<>(false, null, splitResult);
         }

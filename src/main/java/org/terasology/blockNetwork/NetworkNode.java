@@ -24,10 +24,30 @@ import org.terasology.math.geom.Vector3i;
  * Any instance of this class or its children can be used as a node in {@link EfficientNetwork}
  */
 public class NetworkNode {
+    /**
+     * The location this node represents.
+     */
     public final ImmutableBlockLocation location;
     //This variable is created based on a combination of the input and output sides, i.e. it contains any side that is an input, output, or both.
+    /**
+     * A bit field of all sides this node connects on.
+     *
+     * @see SideBitFlag
+     */
     public final byte connectionSides;
+
+    /**
+     * A bit field of all sides from which this node has inputs.
+     *
+     * @see SideBitFlag
+     */
     public final byte inputSides;
+
+    /**
+     * A bit field of all sides from which this node has outputs.
+     *
+     * @see SideBitFlag
+     */
     public final byte outputSides;
 
     /**

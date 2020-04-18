@@ -19,6 +19,11 @@ import com.google.common.base.Predicate;
 import org.terasology.blockNetwork.traversal.BreadthFirstTraversal;
 import org.terasology.blockNetwork.traversal.BreadthFirstTraversalWithPath;
 
+/**
+ * Contains additional searching functionality for a network.
+ *
+ * @param <T> The type of node in this network.
+ */
 public interface Network2<T extends NetworkNode> extends Network<T> {
     /**
      * Allows breadth-first traversing of the network using the visitor passed. The visitor also receives the path
