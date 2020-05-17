@@ -15,7 +15,7 @@
  */
 package org.terasology.blockNetwork;
 
-import org.terasology.marcinsc.blockFamily.RotationBlockFamily;
+import org.terasology.blockNetwork.block.family.RotationBlockFamily;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.math.SideBitFlag;
