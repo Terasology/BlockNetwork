@@ -24,6 +24,7 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockBuilderHelper;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.AbstractBlockFamily;
+import org.terasology.world.block.family.BlockPlacementData;
 import org.terasology.world.block.family.RegisterBlockFamily;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 
@@ -55,7 +56,16 @@ public class FullRotationFamily extends AbstractBlockFamily implements RotationB
     }
 
     @Override
+    public Block getBlockForPlacement(BlockPlacementData data) {
+        return getBlockForPlacement(data.attachmentSide);
+    }
+
+    @Override
     public Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction) {
+        return getBlockForPlacement(attachmentSide);
+    }
+
+    private Block getBlockForPlacement(Side attachmentSide) {
         // Find first one so that FRONT Side of the original block is same as attachmentSide
         for (Map.Entry<Rotation, Block> rotationBlockEntry : blocks.entrySet()) {
             if (rotationBlockEntry.getKey().rotate(Side.FRONT) == attachmentSide) {
