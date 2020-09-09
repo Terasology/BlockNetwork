@@ -1,18 +1,5 @@
-/*
- * Copyright 2015 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.blockNetwork;
 
 import com.google.common.collect.HashMultimap;
@@ -32,11 +19,11 @@ import java.util.Set;
  * @param <T> The type of node in this network.
  */
 public class EfficientBlockNetwork<T extends NetworkNode> {
-    private Set<EfficientNetwork<T>> networks = Sets.newHashSet();
-    private Multimap<ImmutableBlockLocation, T> leafNodes = HashMultimap.create();
-    private Multimap<ImmutableBlockLocation, T> networkingNodes = HashMultimap.create();
+    private final Set<EfficientNetwork<T>> networks = Sets.newHashSet();
+    private final Multimap<ImmutableBlockLocation, T> leafNodes = HashMultimap.create();
+    private final Multimap<ImmutableBlockLocation, T> networkingNodes = HashMultimap.create();
 
-    private Set<EfficientNetworkTopologyListener<T>> listeners = new HashSet<>();
+    private final Set<EfficientNetworkTopologyListener<T>> listeners = new HashSet<>();
 
     private boolean mutating;
 
@@ -67,7 +54,8 @@ public class EfficientBlockNetwork<T extends NetworkNode> {
      *
      * @param networkNode The networking block to add.
      * @param reason The reason for addition.
-     * @throws IllegalArgumentException if the networking block shares a connection side with a networking block in this network.
+     * @throws IllegalArgumentException if the networking block shares a connection side with a networking block
+     *         in this network.
      */
     public void addNetworkingBlock(T networkNode, NetworkChangeReason reason) {
         addNetworkingBlocks(Collections.singleton(networkNode), reason);
@@ -118,7 +106,8 @@ public class EfficientBlockNetwork<T extends NetworkNode> {
      *
      * @param networkNodes The collection of networking blocks to add.
      * @param reason The reason for addition.
-     * @throws IllegalArgumentException if a networking block in <code>networkNodes</code> shares a connection side with a networking block in this network.
+     * @throws IllegalArgumentException if a networking block in <code>networkNodes</code> shares a connection
+     *         side with a networking block in this network.
      */
     public void addNetworkingBlocks(Collection<T> networkNodes, NetworkChangeReason reason) {
         validateNotMutating();
@@ -164,7 +153,8 @@ public class EfficientBlockNetwork<T extends NetworkNode> {
     private void validateNoNetworkingOverlap(T networkNode) {
         for (T nodeAtSamePosition : networkingNodes.get(networkNode.location)) {
             if ((nodeAtSamePosition.connectionSides & networkNode.connectionSides) > 0) {
-                throw new IllegalArgumentException("There is a networking block at that position connecting to some of the same sides already");
+                throw new IllegalArgumentException("There is a networking block at that position connecting to some " +
+                        "of the same sides already");
             }
         }
     }
@@ -172,12 +162,14 @@ public class EfficientBlockNetwork<T extends NetworkNode> {
     private void validateNoLeafOverlap(T networkNode) {
         for (T nodeAtSamePosition : leafNodes.get(networkNode.location)) {
             if ((nodeAtSamePosition.connectionSides & networkNode.connectionSides) > 0) {
-                throw new IllegalArgumentException("There is a leaf block at that position connecting to some of the same sides already");
+                throw new IllegalArgumentException("There is a leaf block at that position connecting to some of the " +
+                        "same sides already");
             }
         }
     }
 
-    private void addNetworkingBlockInternal(T networkNode, NetworkChangeReason reason, Set<EfficientNetwork<T>> networksThatAcceptNode) {
+    private void addNetworkingBlockInternal(T networkNode, NetworkChangeReason reason,
+                                            Set<EfficientNetwork<T>> networksThatAcceptNode) {
         int acceptingNetworkCount = networksThatAcceptNode.size();
         if (acceptingNetworkCount == 0) {
             // This block is not joining any network, just create a new network for it
@@ -195,7 +187,8 @@ public class EfficientBlockNetwork<T extends NetworkNode> {
         }
     }
 
-    private void mergeNetworksWithNode(T networkNode, NetworkChangeReason reason, Set<EfficientNetwork<T>> networksToMerge) {
+    private void mergeNetworksWithNode(T networkNode, NetworkChangeReason reason,
+                                       Set<EfficientNetwork<T>> networksToMerge) {
         EfficientNetwork<T> mergeResult = new EfficientNetwork<>();
 
         for (EfficientNetwork<T> networkToMerge : networksToMerge) {
@@ -266,7 +259,8 @@ public class EfficientBlockNetwork<T extends NetworkNode> {
      *
      * @param networkNode The leaf block to add.
      * @param reason The reason for addition.
-     * @throws IllegalArgumentException if the leaf block shares a connection side with a leaf block in this network.
+     * @throws IllegalArgumentException if the leaf block shares a connection side with a leaf block in this
+     *         network.
      */
     public void addLeafBlock(T networkNode, NetworkChangeReason reason) {
         addLeafBlocks(Collections.singleton(networkNode), reason);
@@ -277,7 +271,8 @@ public class EfficientBlockNetwork<T extends NetworkNode> {
      *
      * @param networkNodes The collection of leaf blocks to add.
      * @param reason The reason for addition.
-     * @throws IllegalArgumentException if a leaf block in <code>networkNodes</code> shares a connection side with a leaf block in this network.
+     * @throws IllegalArgumentException if a leaf block in <code>networkNodes</code> shares a connection side
+     *         with a leaf block in this network.
      */
     public void addLeafBlocks(Collection<T> networkNodes, NetworkChangeReason reason) {
         // No optimizations can be made here
@@ -332,7 +327,8 @@ public class EfficientBlockNetwork<T extends NetworkNode> {
      *
      * @param networkNodes The collection of networking blocks to remove.
      * @param reason The reason for removal.
-     * @throws IllegalArgumentException if a networking block in <code>networkNodes</code> is not in this block network.
+     * @throws IllegalArgumentException if a networking block in <code>networkNodes</code> is not in this block
+     *         network.
      */
     public void removeNetworkingBlocks(Collection<T> networkNodes, NetworkChangeReason reason) {
         if (networkNodes.size() == 0) {
@@ -361,7 +357,8 @@ public class EfficientBlockNetwork<T extends NetworkNode> {
 
         networkingNodes.remove(networkNode.location, networkNode);
 
-        EfficientNetwork.NetworkingNodeRemovalResult<T> removalResult = networkWithBlock.removeNetworkingNodeOrSplit(networkNode);
+        EfficientNetwork.NetworkingNodeRemovalResult<T> removalResult =
+                networkWithBlock.removeNetworkingNodeOrSplit(networkNode);
         if (removalResult.removesNetwork) {
             networks.remove(networkWithBlock);
             notifyNetworkRemoved(networkWithBlock, reason);
@@ -393,7 +390,8 @@ public class EfficientBlockNetwork<T extends NetworkNode> {
      *
      * @param networkNodes The collection of leaf blocks to remove.
      * @param reason The reason for removal.
-     * @throws IllegalArgumentException if a leaf block in <code>networkNodes</code> is not in this block network.
+     * @throws IllegalArgumentException if a leaf block in <code>networkNodes</code> is not in this block
+     *         network.
      */
     public void removeLeafBlocks(Collection<T> networkNodes, NetworkChangeReason reason) {
         // No optimization can be made here
@@ -464,7 +462,8 @@ public class EfficientBlockNetwork<T extends NetworkNode> {
      * Finds a network managed by this object that contains a given networking node as a node.
      *
      * @param networkNode The networking node to find the network of.
-     * @return The network that contains <code>networkNode</code> as a networking node, or null if no network managed by this object contains <code>networkNode</code> as a networking node.
+     * @return The network that contains <code>networkNode</code> as a networking node, or null if no network managed by
+     *         this object contains <code>networkNode</code> as a networking node.
      */
     public Network2 getNetworkWithNetworkingBlock(T networkNode) {
         return findNetworkWithNetworkingBlock(networkNode);
@@ -482,13 +481,15 @@ public class EfficientBlockNetwork<T extends NetworkNode> {
         }
     }
 
-    private void notifyNetworkSplit(EfficientNetwork<T> oldNetwork, Set<EfficientNetwork<T>> newNetworks, NetworkChangeReason reason) {
+    private void notifyNetworkSplit(EfficientNetwork<T> oldNetwork, Set<EfficientNetwork<T>> newNetworks,
+                                    NetworkChangeReason reason) {
         for (EfficientNetworkTopologyListener<T> listener : listeners) {
             listener.networkSplit(oldNetwork, newNetworks, reason);
         }
     }
 
-    private void notifyNetworksMerged(Set<EfficientNetwork<T>> oldNetworks, EfficientNetwork<T> newNetwork, NetworkChangeReason reason) {
+    private void notifyNetworksMerged(Set<EfficientNetwork<T>> oldNetworks, EfficientNetwork<T> newNetwork,
+                                      NetworkChangeReason reason) {
         for (EfficientNetworkTopologyListener<T> listener : listeners) {
             listener.networksMerged(oldNetworks, newNetwork, reason);
         }
@@ -500,7 +501,8 @@ public class EfficientBlockNetwork<T extends NetworkNode> {
         }
     }
 
-    private void notifyNetworkingNodesAdded(EfficientNetwork<T> network, Set<T> networkingNodesToNotify, NetworkChangeReason reason) {
+    private void notifyNetworkingNodesAdded(EfficientNetwork<T> network, Set<T> networkingNodesToNotify,
+                                            NetworkChangeReason reason) {
         if (networkingNodesToNotify.size() > 0) {
             for (EfficientNetworkTopologyListener<T> listener : listeners) {
                 listener.networkingNodesAdded(network, networkingNodesToNotify, reason);
@@ -508,7 +510,8 @@ public class EfficientBlockNetwork<T extends NetworkNode> {
         }
     }
 
-    private void notifyNetworkingNodesRemoved(EfficientNetwork<T> network, Set<T> networkingNodesToNotify, NetworkChangeReason reason) {
+    private void notifyNetworkingNodesRemoved(EfficientNetwork<T> network, Set<T> networkingNodesToNotify,
+                                              NetworkChangeReason reason) {
         if (networkingNodesToNotify.size() > 0) {
             for (EfficientNetworkTopologyListener<T> listener : listeners) {
                 listener.networkingNodesRemoved(network, networkingNodesToNotify, reason);
@@ -516,7 +519,8 @@ public class EfficientBlockNetwork<T extends NetworkNode> {
         }
     }
 
-    private void notifyLeafNodesAdded(EfficientNetwork<T> network, Set<T> leafNodesToNotify, NetworkChangeReason reason) {
+    private void notifyLeafNodesAdded(EfficientNetwork<T> network, Set<T> leafNodesToNotify,
+                                      NetworkChangeReason reason) {
         if (leafNodesToNotify.size() > 0) {
             for (EfficientNetworkTopologyListener<T> listener : listeners) {
                 listener.leafNodesAdded(network, leafNodesToNotify, reason);
@@ -524,7 +528,8 @@ public class EfficientBlockNetwork<T extends NetworkNode> {
         }
     }
 
-    private void notifyLeafNodesRemoved(EfficientNetwork<T> network, Set<T> leafNodesToNotify, NetworkChangeReason reason) {
+    private void notifyLeafNodesRemoved(EfficientNetwork<T> network, Set<T> leafNodesToNotify,
+                                        NetworkChangeReason reason) {
         if (leafNodesToNotify.size() > 0) {
             for (EfficientNetworkTopologyListener<T> listener : listeners) {
                 listener.leafNodesRemoved(network, leafNodesToNotify, reason);

@@ -1,26 +1,13 @@
-/*
- * Copyright 2015 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.blockNetwork;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
-import org.terasology.math.Side;
-import org.terasology.math.SideBitFlag;
+import org.terasology.engine.math.Side;
+import org.terasology.engine.math.SideBitFlag;
 import org.terasology.math.geom.Vector3i;
 
 import java.util.Arrays;
@@ -34,28 +21,27 @@ import java.util.Set;
 /**
  * Represents one network of nodes, where each node is somehow connected to another within the network.
  * <p>
- * Network contains following node types:
- * - networking nodes - nodes that are a back-bone of a network. These allow to connect multiple nodes in the network.
- * A networking node "conducts" the "signal" of the network to nodes defined in the "connectingOnSides" nodes in its
- * vicinity.
- * - leaf nodes - nodes that are only receiving or producing a signal, and do not themselves "conduct" it to other nodes.
+ * Network contains following node types: - networking nodes - nodes that are a back-bone of a network. These allow to
+ * connect multiple nodes in the network. A networking node "conducts" the "signal" of the network to nodes defined in
+ * the "connectingOnSides" nodes in its vicinity. - leaf nodes - nodes that are only receiving or producing a signal,
+ * and do not themselves "conduct" it to other nodes.
  * <p>
- * A couple of non-obvious facts:
- * 1. The same node (defined as location) cannot be both a networking node and a leaf node in the same network.
- * 2. The same leaf node can be a member of multiple disjunctive networks (different network on each side).
- * 3. A valid network can have no networking nodes at all, and exactly two leaf nodes (neighbouring leaf nodes).
+ * A couple of non-obvious facts: 1. The same node (defined as location) cannot be both a networking node and a leaf
+ * node in the same network. 2. The same leaf node can be a member of multiple disjunctive networks (different network
+ * on each side). 3. A valid network can have no networking nodes at all, and exactly two leaf nodes (neighbouring leaf
+ * nodes).
  *
  * @deprecated Use EfficientNetwork, this class will be removed.
  */
 @Deprecated
 public class SimpleNetwork<T extends NetworkNode> implements Network<T> {
     private static final boolean SANITY_CHECK = false;
-    private SetMultimap<ImmutableBlockLocation, T> networkingNodes = HashMultimap.create();
-    private SetMultimap<ImmutableBlockLocation, T> leafNodes = HashMultimap.create();
+    private final SetMultimap<ImmutableBlockLocation, T> networkingNodes = HashMultimap.create();
+    private final SetMultimap<ImmutableBlockLocation, T> leafNodes = HashMultimap.create();
 
     // Distance cache
-    private Map<TwoNetworkNodes, Integer> distanceCache = Maps.newHashMap();
-    private Map<TwoNetworkNodes, List<T>> shortestRouteCache = Maps.newHashMap();
+    private final Map<TwoNetworkNodes, Integer> distanceCache = Maps.newHashMap();
+    private final Map<TwoNetworkNodes, List<T>> shortestRouteCache = Maps.newHashMap();
 
     public static <T extends NetworkNode> SimpleNetwork<T> createDegenerateNetwork(
             T networkNode1,
@@ -68,6 +54,17 @@ public class SimpleNetwork<T extends NetworkNode> implements Network<T> {
         network.leafNodes.put(networkNode1.location, networkNode1);
         network.leafNodes.put(networkNode2.location, networkNode2);
         return network;
+    }
+
+    public static boolean areNodesConnecting(NetworkNode node1, NetworkNode node2) {
+        for (Side side : SideBitFlag.getSides(node1.connectionSides)) {
+            final ImmutableBlockLocation possibleConnectedLocation = node1.location.move(side);
+            if (node2.location.equals(possibleConnectedLocation) && SideBitFlag.hasSide(node2.connectionSides,
+                    side.reverse())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -99,8 +96,8 @@ public class SimpleNetwork<T extends NetworkNode> implements Network<T> {
     }
 
     /**
-     * Returns the network size - a number of nodes it spans. If the same node is added twice with different
-     * connecting sides, it is counted twice.
+     * Returns the network size - a number of nodes it spans. If the same node is added twice with different connecting
+     * sides, it is counted twice.
      *
      * @return The sum of networking nodes and leaf nodes (count).
      */
@@ -110,7 +107,8 @@ public class SimpleNetwork<T extends NetworkNode> implements Network<T> {
     }
 
     /**
-     * Removes a leaf node from the network. If this removal made the network degenerate, it will return <code>true</code>.
+     * Removes a leaf node from the network. If this removal made the network degenerate, it will return
+     * <code>true</code>.
      *
      * @param networkingNode Definition of the leaf node position and connecting sides.
      * @return <code>true</code> if the network after the removal is degenerated or empty (no longer valid).
@@ -158,16 +156,6 @@ public class SimpleNetwork<T extends NetworkNode> implements Network<T> {
     @Override
     public Collection<T> getLeafNodes() {
         return Collections.unmodifiableCollection(leafNodes.values());
-    }
-
-    public static boolean areNodesConnecting(NetworkNode node1, NetworkNode node2) {
-        for (Side side : SideBitFlag.getSides(node1.connectionSides)) {
-            final ImmutableBlockLocation possibleConnectedLocation = node1.location.move(side);
-            if (node2.location.equals(possibleConnectedLocation) && SideBitFlag.hasSide(node2.connectionSides, side.reverse())) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
@@ -375,7 +363,8 @@ public class SimpleNetwork<T extends NetworkNode> implements Network<T> {
         }
     }
 
-    private void listConnectedNotVisitedNetworkingNodes(Set<NetworkNode> visitedNodes, NetworkNode location, Collection<NetworkNode> result) {
+    private void listConnectedNotVisitedNetworkingNodes(Set<NetworkNode> visitedNodes, NetworkNode location,
+                                                        Collection<NetworkNode> result) {
         for (Side connectingOnSide : SideBitFlag.getSides(location.connectionSides)) {
             final ImmutableBlockLocation possibleConnectionLocation = location.location.move(connectingOnSide);
             for (T possibleConnection : networkingNodes.get(possibleConnectionLocation)) {
@@ -386,7 +375,8 @@ public class SimpleNetwork<T extends NetworkNode> implements Network<T> {
         }
     }
 
-    private void listConnectedNotVisitedNetworkingNodes(Map<T, List<T>> visitedNodes, T location, Map<T, List<T>> result) {
+    private void listConnectedNotVisitedNetworkingNodes(Map<T, List<T>> visitedNodes, T location,
+                                                        Map<T, List<T>> result) {
         for (Side connectingOnSide : SideBitFlag.getSides(location.connectionSides)) {
             final ImmutableBlockLocation possibleConnectionLocation = location.location.move(connectingOnSide);
             for (T possibleConnection : networkingNodes.get(possibleConnectionLocation)) {

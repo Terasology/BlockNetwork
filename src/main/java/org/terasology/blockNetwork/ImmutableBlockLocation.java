@@ -1,21 +1,8 @@
-/*
- * Copyright 2014 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.blockNetwork;
 
-import org.terasology.math.Side;
+import org.terasology.engine.math.Side;
 import org.terasology.math.geom.Vector3i;
 
 /**
@@ -36,12 +23,12 @@ public class ImmutableBlockLocation {
      * z-coordinate of the location.
      */
     public final int z;
-    
+
     public ImmutableBlockLocation(Vector3i location) {
         this(location.x, location.y, location.z);
     }
-    
-     /**
+
+    /**
      * ImmutableBlockLocation constructor.
      *
      * @param x x-coordinate
@@ -53,20 +40,20 @@ public class ImmutableBlockLocation {
         this.y = y;
         this.z = z;
     }
-    
-     /**
+
+    /**
      * Creates a new ImmutableBlockLocation in a relative location.
      *
      * @param side a specific side.
-     * @return a new ImmutableBlockLocation determined by adding the x-component of the directionVector to x, the y-component
-     * of the directionVector to y, and the z-component of the directionVector to z.
+     * @return a new ImmutableBlockLocation determined by adding the x-component of the directionVector to x, the
+     *         y-component of the directionVector to y, and the z-component of the directionVector to z.
      */
     public ImmutableBlockLocation move(Side side) {
         final Vector3i directionVector = side.getVector3i();
         return new ImmutableBlockLocation(x + directionVector.x, y + directionVector.y, z + directionVector.z);
     }
-    
-     /**
+
+    /**
      * Creates a Vector3i.
      *
      * @return a new Vector3i with the same x-y-z coordinates of this.
@@ -75,12 +62,13 @@ public class ImmutableBlockLocation {
         return new Vector3i(x, y, z);
     }
 
-     /**
+    /**
      * Reports if two objects are equal to each other.
      *
      * @param o An object.
-     * @return <code>true</code> if this is equal to object o. Will also return <code>true</code> if o exists and has the same
-     * x-y-z coordinates as this.
+     * @return <code>true</code> if this is equal to object o. Will also return <code>true</code> if o exists and has
+     *         the same
+     *         x-y-z coordinates as this.
      */
     @Override
     public boolean equals(Object o) {
@@ -99,11 +87,7 @@ public class ImmutableBlockLocation {
         if (y != that.y) {
             return false;
         }
-        if (z != that.z) {
-            return false;
-        }
-
-        return true;
+        return z == that.z;
     }
 
     /**

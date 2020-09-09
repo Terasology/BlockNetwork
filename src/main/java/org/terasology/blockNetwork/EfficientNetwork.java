@@ -1,18 +1,5 @@
-/*
- * Copyright 2015 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.blockNetwork;
 
 import com.google.common.base.Predicate;
@@ -25,8 +12,8 @@ import com.google.common.collect.Sets;
 import org.terasology.blockNetwork.traversal.BreadthFirstTraversal;
 import org.terasology.blockNetwork.traversal.BreadthFirstTraversalWithPath;
 import org.terasology.blockNetwork.traversal.TraversalResult;
-import org.terasology.math.Side;
-import org.terasology.math.SideBitFlag;
+import org.terasology.engine.math.Side;
+import org.terasology.engine.math.SideBitFlag;
 import org.terasology.math.geom.Vector3i;
 
 import javax.annotation.Nullable;
@@ -42,25 +29,24 @@ import java.util.Set;
 /**
  * Represents one network of nodes, where each node is somehow connected to another within the network.
  * <p>
- * Network contains following node types:
- * - networking nodes - nodes that are a back-bone of a network. These allow to connect multiple nodes in the network.
- * A networking node "conducts" the "signal" of the network to nodes defined in the "connectingOnSides" nodes in its
- * vicinity.
- * - leaf nodes - nodes that are only receiving or producing a signal, and do not themselves "conduct" it to other nodes.
+ * Network contains following node types: - networking nodes - nodes that are a back-bone of a network. These allow to
+ * connect multiple nodes in the network. A networking node "conducts" the "signal" of the network to nodes defined in
+ * the "connectingOnSides" nodes in its vicinity. - leaf nodes - nodes that are only receiving or producing a signal,
+ * and do not themselves "conduct" it to other nodes.
  * <p>
- * A couple of non-obvious facts:
- * 1. The same node (defined as location) cannot be both a networking node and a leaf node in the same network.
- * 2. The same leaf node can be a member of multiple disjunctive networks (different network on each side).
- * 3. A valid network can have no networking nodes at all, and exactly two leaf nodes (neighbouring leaf nodes).
+ * A couple of non-obvious facts: 1. The same node (defined as location) cannot be both a networking node and a leaf
+ * node in the same network. 2. The same leaf node can be a member of multiple disjunctive networks (different network
+ * on each side). 3. A valid network can have no networking nodes at all, and exactly two leaf nodes (neighbouring leaf
+ * nodes).
  */
 public class EfficientNetwork<T extends NetworkNode> implements Network2<T> {
     private static final boolean SANITY_CHECK = false;
-    private SetMultimap<ImmutableBlockLocation, T> networkingNodes = HashMultimap.create();
-    private SetMultimap<ImmutableBlockLocation, T> leafNodes = HashMultimap.create();
+    private final SetMultimap<ImmutableBlockLocation, T> networkingNodes = HashMultimap.create();
+    private final SetMultimap<ImmutableBlockLocation, T> leafNodes = HashMultimap.create();
 
     // Distance cache
-    private Map<TwoNetworkNodes, Integer> distanceCache = Maps.newHashMap();
-    private Map<TwoNetworkNodes, List<T>> shortestRouteCache = Maps.newHashMap();
+    private final Map<TwoNetworkNodes, Integer> distanceCache = Maps.newHashMap();
+    private final Map<TwoNetworkNodes, List<T>> shortestRouteCache = Maps.newHashMap();
 
     /**
      * Creates a network containing only two given nodes as leaves.
@@ -81,6 +67,31 @@ public class EfficientNetwork<T extends NetworkNode> implements Network2<T> {
         network.leafNodes.put(networkNode1.location, networkNode1);
         network.leafNodes.put(networkNode2.location, networkNode2);
         return network;
+    }
+
+    /**
+     * Checks if two given nodes are directly connecting.
+     *
+     * @param node1 The first node
+     * @param node2 The second node
+     * @return true if the two nodes are directly connecting, output to input. Otherwise, false.
+     */
+    public static boolean areNodesConnecting(NetworkNode node1, NetworkNode node2) {
+        for (Side side : SideBitFlag.getSides(node1.inputSides)) {
+            final ImmutableBlockLocation possibleConnectedLocation = node1.location.move(side);
+            if (node2.location.equals(possibleConnectedLocation) && SideBitFlag.hasSide(node2.outputSides,
+                    side.reverse())) {
+                return true;
+            }
+        }
+        for (Side side : SideBitFlag.getSides(node1.outputSides)) {
+            final ImmutableBlockLocation possibleConnectedLocation = node1.location.move(side);
+            if (node2.location.equals(possibleConnectedLocation) && SideBitFlag.hasSide(node2.inputSides,
+                    side.reverse())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -121,8 +132,8 @@ public class EfficientNetwork<T extends NetworkNode> implements Network2<T> {
     }
 
     /**
-     * Returns the network size - a number of nodes it spans. If the same node is added twice with different
-     * connecting sides, it is counted twice.
+     * Returns the network size - a number of nodes it spans. If the same node is added twice with different connecting
+     * sides, it is counted twice.
      *
      * @return The sum of networking nodes and leaf nodes (count).
      */
@@ -256,29 +267,6 @@ public class EfficientNetwork<T extends NetworkNode> implements Network2<T> {
     }
 
     /**
-     * Checks if two given nodes are directly connecting.
-     *
-     * @param node1 The first node
-     * @param node2 The second node
-     * @return true if the two nodes are directly connecting, output to input. Otherwise, false.
-     */
-    public static boolean areNodesConnecting(NetworkNode node1, NetworkNode node2) {
-        for (Side side : SideBitFlag.getSides(node1.inputSides)) {
-            final ImmutableBlockLocation possibleConnectedLocation = node1.location.move(side);
-            if (node2.location.equals(possibleConnectedLocation) && SideBitFlag.hasSide(node2.outputSides, side.reverse())) {
-                return true;
-            }
-        }
-        for (Side side : SideBitFlag.getSides(node1.outputSides)) {
-            final ImmutableBlockLocation possibleConnectedLocation = node1.location.move(side);
-            if (node2.location.equals(possibleConnectedLocation) && SideBitFlag.hasSide(node2.inputSides, side.reverse())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * If this network can connect to node at the location specified with the specified connecting sides.
      *
      * @param networkNode Definition of the networking node position and connecting sides.
@@ -385,7 +373,7 @@ public class EfficientNetwork<T extends NetworkNode> implements Network2<T> {
 
                         return TraversalResult.continuePath(distance);
                     }
-                }, Predicates.<T>alwaysTrue(), -1, 1);
+                }, Predicates.alwaysTrue(), -1, 1);
     }
 
     @Override
@@ -425,11 +413,11 @@ public class EfficientNetwork<T extends NetworkNode> implements Network2<T> {
                             shortestRouteCache.put(
                                     new TwoNetworkNodes(from, to),
                                     route);
-                            return TraversalResult.<T, List<T>, Void>returnResult(route);
+                            return TraversalResult.returnResult(route);
                         }
                         return TraversalResult.continuePath(null);
                     }
-                }, Predicates.<T>alwaysTrue(), null, null);
+                }, Predicates.alwaysTrue(), null, null);
     }
 
     private void validateAnyOfTheNodesInNetwork(T from, T to) {
@@ -502,7 +490,8 @@ public class EfficientNetwork<T extends NetworkNode> implements Network2<T> {
     }
 
     @Override
-    public <U, V> U traverseBreadthFirstWithPath(T from, BreadthFirstTraversalWithPath<T, U, V> traversal, Predicate<T> defaultPredicate,
+    public <U, V> U traverseBreadthFirstWithPath(T from, BreadthFirstTraversalWithPath<T, U, V> traversal,
+                                                 Predicate<T> defaultPredicate,
                                                  U defaultResult, V initialValue) {
         if (!hasNetworkingNode(from) && !hasLeafNode(from)) {
             throw new IllegalArgumentException("Asked to traverse Network starting at a node not in the network.");
@@ -516,9 +505,11 @@ public class EfficientNetwork<T extends NetworkNode> implements Network2<T> {
         while (!traversalDataMap.isEmpty()) {
             Map<T, TraversalParams<T, V>> nextTraversalDataMap = Maps.newHashMap();
 
-            for (TraversalDataWithPath<T, V> traversalData : listNextTraversalLevelWithPath(traversalDataMap, visitedNodes)) {
+            for (TraversalDataWithPath<T, V> traversalData : listNextTraversalLevelWithPath(traversalDataMap,
+                    visitedNodes)) {
                 visitedNodes.put(traversalData.node, traversalData.path);
-                TraversalResult<T, U, V> nodeResult = traversal.visitNode(traversalData.node, traversalData.value, traversalData.path);
+                TraversalResult<T, U, V> nodeResult = traversal.visitNode(traversalData.node, traversalData.value,
+                        traversalData.path);
                 if (nodeResult.stopTraversal) {
                     return nodeResult.result;
                 }
@@ -532,7 +523,8 @@ public class EfficientNetwork<T extends NetworkNode> implements Network2<T> {
     }
 
     @Override
-    public <U, V> U traverseBreadthFirst(T from, BreadthFirstTraversal<T, U, V> traversal, Predicate<T> defaultPredicate,
+    public <U, V> U traverseBreadthFirst(T from, BreadthFirstTraversal<T, U, V> traversal,
+                                         Predicate<T> defaultPredicate,
                                          U defaultResult, V initialValue) {
         if (!hasNetworkingNode(from) && !hasLeafNode(from)) {
             throw new IllegalArgumentException("Asked to traverse Network starting at a node not in the network.");
@@ -540,7 +532,8 @@ public class EfficientNetwork<T extends NetworkNode> implements Network2<T> {
         return traverseBreadthFirstInternal(from, traversal, defaultPredicate, defaultResult, initialValue);
     }
 
-    private <U, V> U traverseBreadthFirstInternal(NetworkNode from, BreadthFirstTraversal<T, U, V> traversal, Predicate<T> defaultPredicate,
+    private <U, V> U traverseBreadthFirstInternal(NetworkNode from, BreadthFirstTraversal<T, U, V> traversal,
+                                                  Predicate<T> defaultPredicate,
                                                   U defaultResult, V initialValue) {
 
         Set<NetworkNode> visitedNodes = Sets.newHashSet();
@@ -613,8 +606,8 @@ public class EfficientNetwork<T extends NetworkNode> implements Network2<T> {
     }
 
     private static class TraversalData<T, V> {
-        private T node;
-        private V value;
+        private final T node;
+        private final V value;
 
         private TraversalData(T node, V value) {
             this.node = node;
@@ -623,9 +616,9 @@ public class EfficientNetwork<T extends NetworkNode> implements Network2<T> {
     }
 
     private static class TraversalDataWithPath<T, V> {
-        private T node;
-        private V value;
-        private List<T> path;
+        private final T node;
+        private final V value;
+        private final List<T> path;
 
         private TraversalDataWithPath(T node, V value, List<T> path) {
             this.node = node;
@@ -635,8 +628,8 @@ public class EfficientNetwork<T extends NetworkNode> implements Network2<T> {
     }
 
     private static class TraversalParams<T, V> {
-        private Predicate<T> predicate;
-        private V value;
+        private final Predicate<T> predicate;
+        private final V value;
 
         private TraversalParams(Predicate<T> predicate, V value) {
             this.predicate = predicate;
@@ -663,7 +656,8 @@ public class EfficientNetwork<T extends NetworkNode> implements Network2<T> {
          */
         public final Set<EfficientNetwork<T>> splitResult;
 
-        private NetworkingNodeRemovalResult(boolean removesNetwork, Set<T> removedLeafNodes, Set<EfficientNetwork<T>> splitResult) {
+        private NetworkingNodeRemovalResult(boolean removesNetwork, Set<T> removedLeafNodes,
+                                            Set<EfficientNetwork<T>> splitResult) {
             this.removesNetwork = removesNetwork;
             this.removedLeafNodes = removedLeafNodes;
             this.splitResult = splitResult;

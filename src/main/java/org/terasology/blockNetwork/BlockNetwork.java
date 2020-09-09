@@ -1,18 +1,5 @@
-/*
- * Copyright 2015 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.blockNetwork;
 
 import com.google.common.collect.HashMultimap;
@@ -28,16 +15,16 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * @deprecated Use EfficientBlockNetwork, this class will be removed.
  * @param <T>
+ * @deprecated Use EfficientBlockNetwork, this class will be removed.
  */
 @Deprecated
 public class BlockNetwork<T extends NetworkNode> {
-    private Set<SimpleNetwork<T>> networks = Sets.newHashSet();
-    private Multimap<ImmutableBlockLocation, T> leafNodes = HashMultimap.create();
-    private Multimap<ImmutableBlockLocation, T> networkingNodes = HashMultimap.create();
+    private final Set<SimpleNetwork<T>> networks = Sets.newHashSet();
+    private final Multimap<ImmutableBlockLocation, T> leafNodes = HashMultimap.create();
+    private final Multimap<ImmutableBlockLocation, T> networkingNodes = HashMultimap.create();
 
-    private Set<NetworkTopologyListener<T>> listeners = new HashSet<>();
+    private final Set<NetworkTopologyListener<T>> listeners = new HashSet<>();
 
     private boolean mutating;
 
@@ -78,7 +65,8 @@ public class BlockNetwork<T extends NetworkNode> {
     private void validateNoNetworkingOverlap(T networkNode) {
         for (T nodeAtSamePosition : networkingNodes.get(networkNode.location)) {
             if ((nodeAtSamePosition.connectionSides & networkNode.connectionSides) > 0) {
-                throw new IllegalStateException("There is a networking block at that position connecting to some of the same sides already");
+                throw new IllegalStateException("There is a networking block at that position connecting to some of " +
+                        "the same sides already");
             }
         }
     }
@@ -86,7 +74,8 @@ public class BlockNetwork<T extends NetworkNode> {
     private void validateNoLeafOverlap(T networkNode) {
         for (T nodeAtSamePosition : leafNodes.get(networkNode.location)) {
             if ((nodeAtSamePosition.connectionSides & networkNode.connectionSides) > 0) {
-                throw new IllegalStateException("There is a leaf block at that position connecting to some of the same sides already");
+                throw new IllegalStateException("There is a leaf block at that position connecting to some of the " +
+                        "same sides already");
             }
         }
     }
@@ -207,13 +196,15 @@ public class BlockNetwork<T extends NetworkNode> {
             SimpleNetwork<T> networkWithBlock = findNetworkWithNetworkingBlock(networkNode);
 
             if (networkWithBlock == null) {
-                throw new IllegalStateException("Trying to remove a networking block that doesn't belong to any network");
+                throw new IllegalStateException("Trying to remove a networking block that doesn't belong to any " +
+                        "network");
             }
 
             networkingNodes.remove(networkNode.location, networkNode);
 
             // Naive implementation, just remove everything and start over
-            // TODO: Improve to actually detects the branches of splits and build separate network for each disjunctioned
+            // TODO: Improve to actually detects the branches of splits and build separate network for each
+            //  disjunctioned
             // TODO: network
             Set<T> networkingNodesToNotify = Sets.newHashSet(networkWithBlock.getNetworkingNodes());
             Set<T> leafNodesToNotify = Sets.newHashSet(networkWithBlock.getLeafNodes());
@@ -249,7 +240,8 @@ public class BlockNetwork<T extends NetworkNode> {
             for (T networkNode : networkNodes) {
                 final SimpleNetwork<T> networkWithBlock = findNetworkWithNetworkingBlock(networkNode);
                 if (networkWithBlock == null) {
-                    throw new IllegalStateException("Trying to remove a networking block that doesn't belong to any network");
+                    throw new IllegalStateException("Trying to remove a networking block that doesn't belong to any " +
+                            "network");
                 }
 
                 affectedNetworks.add(networkWithBlock);

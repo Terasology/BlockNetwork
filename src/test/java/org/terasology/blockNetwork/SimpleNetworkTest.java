@@ -1,24 +1,11 @@
-/*
- * Copyright 2014 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.blockNetwork;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.terasology.math.Side;
-import org.terasology.math.SideBitFlag;
+import org.terasology.engine.math.Side;
+import org.terasology.engine.math.SideBitFlag;
 import org.terasology.math.geom.Vector3i;
 
 import java.util.List;
@@ -66,19 +53,22 @@ public class SimpleNetworkTest {
 
     @Test
     public void creatingDegenerateNetwork() {
-        network = SimpleNetwork.createDegenerateNetwork(toNode(new Vector3i(0, 0, 1), allDirections), toNode(new Vector3i(0, 0, 0), allDirections));
+        network = SimpleNetwork.createDegenerateNetwork(toNode(new Vector3i(0, 0, 1), allDirections),
+                toNode(new Vector3i(0, 0, 0), allDirections));
         assertEquals(2, network.getNetworkSize());
     }
 
     @Test
     public void cantAddNetworkingNodeToDegeneratedNetwork() {
-        network = SimpleNetwork.createDegenerateNetwork(toNode(new Vector3i(0, 0, 1), allDirections), toNode(new Vector3i(0, 0, 0), allDirections));
+        network = SimpleNetwork.createDegenerateNetwork(toNode(new Vector3i(0, 0, 1), allDirections),
+                toNode(new Vector3i(0, 0, 0), allDirections));
         assertFalse(network.canAddNetworkingNode(toNode(new Vector3i(0, 0, 2), allDirections)));
     }
 
     @Test
     public void cantAddLeafNodeToDegeneratedNetwork() {
-        network = SimpleNetwork.createDegenerateNetwork(toNode(new Vector3i(0, 0, 1), allDirections), toNode(new Vector3i(0, 0, 0), allDirections));
+        network = SimpleNetwork.createDegenerateNetwork(toNode(new Vector3i(0, 0, 1), allDirections),
+                toNode(new Vector3i(0, 0, 0), allDirections));
         assertFalse(network.canAddLeafNode(toNode(new Vector3i(0, 0, 2), allDirections)));
     }
 
@@ -134,7 +124,8 @@ public class SimpleNetworkTest {
 
     @Test
     public void cantAddNodeToNetworkWithTwoLeafNodes() {
-        network = SimpleNetwork.createDegenerateNetwork(toNode(new Vector3i(0, 0, 2), allDirections), toNode(new Vector3i(0, 0, 1), allDirections));
+        network = SimpleNetwork.createDegenerateNetwork(toNode(new Vector3i(0, 0, 2), allDirections),
+                toNode(new Vector3i(0, 0, 1), allDirections));
 
         assertFalse(network.canAddNetworkingNode(toNode(new Vector3i(0, 0, 0), allDirections)));
     }
@@ -150,7 +141,8 @@ public class SimpleNetworkTest {
 
     @Test
     public void removeLeafNodeFromConnectedNetworkWithOnlyLeafNodes() {
-        network = SimpleNetwork.createDegenerateNetwork(toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(0, 0, 1), allDirections));
+        network = SimpleNetwork.createDegenerateNetwork(toNode(new Vector3i(0, 0, 0), allDirections),
+                toNode(new Vector3i(0, 0, 1), allDirections));
 
         assertTrue(network.removeLeafNode(toNode(new Vector3i(0, 0, 0), allDirections)));
         assertEquals(1, network.getNetworkSize());
@@ -161,16 +153,21 @@ public class SimpleNetworkTest {
         network.addNetworkingNode(toNode(new Vector3i(0, 0, 1), allDirections));
         network.addLeafNode(toNode(new Vector3i(0, 0, 0), allDirections));
 
-        assertEquals(0, network.getDistance(toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(0, 0, 0), allDirections), 0));
-        assertEquals(0, network.getDistance(toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(0, 0, 0), allDirections), Integer.MAX_VALUE));
+        assertEquals(0, network.getDistance(toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(0, 0,
+                0), allDirections), 0));
+        assertEquals(0, network.getDistance(toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(0, 0,
+                0), allDirections), Integer.MAX_VALUE));
     }
 
     @Test
     public void distanceForDegeneratedNetwork() {
-        network = SimpleNetwork.createDegenerateNetwork(toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(0, 0, 1), allDirections));
+        network = SimpleNetwork.createDegenerateNetwork(toNode(new Vector3i(0, 0, 0), allDirections),
+                toNode(new Vector3i(0, 0, 1), allDirections));
 
-        assertEquals(1, network.getDistance(toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(0, 0, 1), allDirections), 1));
-        assertEquals(1, network.getDistance(toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(0, 0, 1), allDirections), Integer.MAX_VALUE));
+        assertEquals(1, network.getDistance(toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(0, 0,
+                1), allDirections), 1));
+        assertEquals(1, network.getDistance(toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(0, 0,
+                1), allDirections), Integer.MAX_VALUE));
     }
 
     @Test
@@ -208,9 +205,12 @@ public class SimpleNetworkTest {
             network.addNetworkingNode(toNode(new Vector3i(0, 0, i), allDirections));
         }
 
-        assertEquals(9, network.getDistance(toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(0, 0, 9), allDirections), 9));
-        assertEquals(-1, network.getDistance(toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(0, 0, 9), allDirections), 8));
-        assertEquals(9, network.getDistance(toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(0, 0, 9), allDirections), Integer.MAX_VALUE));
+        assertEquals(9, network.getDistance(toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(0, 0,
+                9), allDirections), 9));
+        assertEquals(-1, network.getDistance(toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(0, 0,
+                9), allDirections), 8));
+        assertEquals(9, network.getDistance(toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(0, 0,
+                9), allDirections), Integer.MAX_VALUE));
     }
 
     @Test
@@ -223,9 +223,12 @@ public class SimpleNetworkTest {
             network.addNetworkingNode(toNode(new Vector3i(i, 0, 5), allDirections));
         }
 
-        assertEquals(10, network.getDistance(toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(5, 0, 5), allDirections), 10));
-        assertEquals(-1, network.getDistance(toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(5, 0, 5), allDirections), 9));
-        assertEquals(10, network.getDistance(toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(5, 0, 5), allDirections), Integer.MAX_VALUE));
+        assertEquals(10, network.getDistance(toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(5, 0,
+                5), allDirections), 10));
+        assertEquals(-1, network.getDistance(toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(5, 0,
+                5), allDirections), 9));
+        assertEquals(10, network.getDistance(toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(5, 0,
+                5), allDirections), Integer.MAX_VALUE));
     }
 
     @Test
@@ -238,7 +241,8 @@ public class SimpleNetworkTest {
             network.addNetworkingNode(toNode(new Vector3i(i, 0, 5), allDirections));
         }
 
-        final List<NetworkNode> route = network.findShortestRoute(toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(5, 0, 5), allDirections));
+        final List<NetworkNode> route = network.findShortestRoute(toNode(new Vector3i(0, 0, 0), allDirections),
+                toNode(new Vector3i(5, 0, 5), allDirections));
         assertEquals(11, route.size());
         assertEquals(toNode(new Vector3i(0, 0, 0), allDirections), route.get(0));
         assertEquals(toNode(new Vector3i(0, 0, 1), allDirections), route.get(1));
