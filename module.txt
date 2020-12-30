@@ -1,10 +1,10 @@
 {
-    "id": "BlockNetwork",
-    "version": "1.0.0",
-    "author": "Marcin Sciesinski <marcins78@gmail.com>",
-    "displayName": "Block Networks",
-    "description": "Library module that adds functionality of grouping blocks into networks",
-    "dependencies": [],
-    "isServerSideOnly": false,
-    "isLibrary": true
+  "id": "BlockNetwork",
+  "version": "1.1.0-SNAPSHOT",
+  "author": "Marcin Sciesinski <marcins78@gmail.com>",
+  "displayName": "Block Networks",
+  "description": "Library module that adds functionality of grouping blocks into networks",
+  "dependencies": [],
+  "isServerSideOnly": false,
+  "isLibrary": true
 }
