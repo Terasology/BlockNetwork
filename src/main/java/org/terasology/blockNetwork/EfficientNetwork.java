@@ -22,12 +22,12 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
+import org.joml.Vector3i;
 import org.terasology.blockNetwork.traversal.BreadthFirstTraversal;
 import org.terasology.blockNetwork.traversal.BreadthFirstTraversalWithPath;
 import org.terasology.blockNetwork.traversal.TraversalResult;
 import org.terasology.math.Side;
 import org.terasology.math.SideBitFlag;
-import org.terasology.math.geom.Vector3i;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
@@ -449,7 +449,7 @@ public class EfficientNetwork<T extends NetworkNode> implements Network2<T> {
             // Degenerated network
             for (Side connectingOnSide : SideBitFlag.getSides(networkNode.inputSides)) {
                 Vector3i possibleLocation = networkNode.location.toVector3i();
-                possibleLocation.add(connectingOnSide.getVector3i());
+                possibleLocation.add(connectingOnSide.direction());
                 for (NetworkNode node : leafNodes.get(new ImmutableBlockLocation(possibleLocation))) {
                     if (SideBitFlag.hasSide(node.outputSides, connectingOnSide.reverse())) {
                         return SideBitFlag.getSide(connectingOnSide);
@@ -459,7 +459,7 @@ public class EfficientNetwork<T extends NetworkNode> implements Network2<T> {
 
             for (Side connectingOnSide : SideBitFlag.getSides(networkNode.outputSides)) {
                 Vector3i possibleLocation = networkNode.location.toVector3i();
-                possibleLocation.add(connectingOnSide.getVector3i());
+                possibleLocation.add(connectingOnSide.direction());
                 for (NetworkNode node : leafNodes.get(new ImmutableBlockLocation(possibleLocation))) {
                     if (SideBitFlag.hasSide(node.inputSides, connectingOnSide.reverse())) {
                         return SideBitFlag.getSide(connectingOnSide);
@@ -472,7 +472,7 @@ public class EfficientNetwork<T extends NetworkNode> implements Network2<T> {
             byte result = 0;
             for (Side connectingOnSide : SideBitFlag.getSides(networkNode.outputSides)) {
                 Vector3i possibleLocation = networkNode.location.toVector3i();
-                possibleLocation.add(connectingOnSide.getVector3i());
+                possibleLocation.add(connectingOnSide.direction());
                 for (NetworkNode node : networkingNodes.get(new ImmutableBlockLocation(possibleLocation))) {
                     if (SideBitFlag.hasSide(node.inputSides, connectingOnSide.reverse())) {
                         result += SideBitFlag.getSide(connectingOnSide);
@@ -481,7 +481,7 @@ public class EfficientNetwork<T extends NetworkNode> implements Network2<T> {
             }
             for (Side connectingOnSide : SideBitFlag.getSides(networkNode.inputSides)) {
                 Vector3i possibleLocation = networkNode.location.toVector3i();
-                possibleLocation.add(connectingOnSide.getVector3i());
+                possibleLocation.add(connectingOnSide.direction());
                 for (NetworkNode node : networkingNodes.get(new ImmutableBlockLocation(possibleLocation))) {
                     if (SideBitFlag.hasSide(node.outputSides, connectingOnSide.reverse())) {
                         result += SideBitFlag.getSide(connectingOnSide);

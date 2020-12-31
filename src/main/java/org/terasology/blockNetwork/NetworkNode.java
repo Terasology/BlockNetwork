@@ -15,9 +15,9 @@
  */
 package org.terasology.blockNetwork;
 
+import org.joml.Vector3ic;
 import org.terasology.math.Side;
 import org.terasology.math.SideBitFlag;
-import org.terasology.math.geom.Vector3i;
 
 /**
  * Represents a single node in a block network.
@@ -51,56 +51,68 @@ public class NetworkNode {
     public final byte outputSides;
 
     /**
-     * @deprecated Use the constructor with separate input and output sides.
      * @param location
      * @param connectionSides
+     * @deprecated Use the constructor with separate input and output sides.
      */
     @Deprecated
-    public NetworkNode(Vector3i location, byte connectionSides) {
+    public NetworkNode(Vector3ic location, byte connectionSides) {
         this(location, connectionSides, connectionSides);
     }
 
     /**
-     * @deprecated Use the constructor with separate input and output sides.
      * @param location
      * @param sides
+     * @deprecated Use the constructor with separate input and output sides.
      */
     @Deprecated
-    public NetworkNode(Vector3i location, Side... sides) {
+    public NetworkNode(Vector3ic location, Side... sides) {
         this(location, SideBitFlag.getSides(sides));
     }
 
     /**
      * Creates a new node based on the given location and input/output sides.
+     *
      * @param location The location of the node
      * @param inputSides The sides which can be used for input
      * @param outputSides The sides which can be used for output
-     * @throws IllegalArgumentException if the input or output sides don't represent the sides of a block (i.e., they are outside of the 0-63 range)
+     * @throws IllegalArgumentException if the input or output sides don't represent the sides of a block (i.e.,
+     *     they are outside of the 0-63 range)
      */
-    public NetworkNode(Vector3i location, byte inputSides, byte outputSides) {
+    public NetworkNode(Vector3ic location, byte inputSides, byte outputSides) {
         if (inputSides > 63 || inputSides < 0 || outputSides > 63 || outputSides < 0) {
             throw new IllegalArgumentException("Connection sides has to be in the 0-63 range");
         }
-        this.location = new ImmutableBlockLocation(location.x, location.y, location.z);
+        this.location = new ImmutableBlockLocation(location.x(), location.y(), location.z());
         this.connectionSides = (byte) (inputSides | outputSides);
         this.inputSides = inputSides;
         this.outputSides = outputSides;
     }
-    
+
     /**
-     * {@inheritDoc}
-     * Note that two Nodes are are considered equal only if the location, inputSides, and outputSides are the same
+     * {@inheritDoc} Note that two Nodes are are considered equal only if the location, inputSides, and outputSides are
+     * the same
      */
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         NetworkNode that = (NetworkNode) o;
 
-        if (inputSides != that.inputSides) return false;
-        if (outputSides != that.outputSides) return false;
-        if (location != null ? !location.equals(that.location) : that.location != null) return false;
+        if (inputSides != that.inputSides) {
+            return false;
+        }
+        if (outputSides != that.outputSides) {
+            return false;
+        }
+        if (location != null ? !location.equals(that.location) : that.location != null) {
+            return false;
+        }
 
         return true;
     }

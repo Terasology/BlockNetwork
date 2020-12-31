@@ -15,8 +15,9 @@
  */
 package org.terasology.blockNetwork;
 
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.math.Side;
-import org.terasology.math.geom.Vector3i;
 
 /**
  * Contains a block location immutably.
@@ -36,11 +37,11 @@ public class ImmutableBlockLocation {
      * z-coordinate of the location.
      */
     public final int z;
-    
-    public ImmutableBlockLocation(Vector3i location) {
-        this(location.x, location.y, location.z);
+
+    public ImmutableBlockLocation(Vector3ic location) {
+        this(location.x(), location.y(), location.z());
     }
-    
+
      /**
      * ImmutableBlockLocation constructor.
      *
@@ -53,7 +54,7 @@ public class ImmutableBlockLocation {
         this.y = y;
         this.z = z;
     }
-    
+
      /**
      * Creates a new ImmutableBlockLocation in a relative location.
      *
@@ -62,10 +63,10 @@ public class ImmutableBlockLocation {
      * of the directionVector to y, and the z-component of the directionVector to z.
      */
     public ImmutableBlockLocation move(Side side) {
-        final Vector3i directionVector = side.getVector3i();
-        return new ImmutableBlockLocation(x + directionVector.x, y + directionVector.y, z + directionVector.z);
+        final Vector3ic directionVector = side.direction();
+        return new ImmutableBlockLocation(x + directionVector.x(), y + directionVector.y(), z + directionVector.z());
     }
-    
+
      /**
      * Creates a Vector3i.
      *

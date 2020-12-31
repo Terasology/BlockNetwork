@@ -18,11 +18,12 @@ package org.terasology.blockNetwork;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.junit.Before;
 import org.junit.Test;
 import org.terasology.math.Side;
 import org.terasology.math.SideBitFlag;
-import org.terasology.math.geom.Vector3i;
 
 import java.util.Set;
 
@@ -45,7 +46,7 @@ public class EfficientBlockNetworkTest {
         allDirections = 63;
     }
 
-    private NetworkNode toNode(Vector3i location, byte directions) {
+    private NetworkNode toNode(Vector3ic location, byte directions) {
         return new NetworkNode(location, directions);
     }
 

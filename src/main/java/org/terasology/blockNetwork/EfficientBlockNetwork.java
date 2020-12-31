@@ -18,7 +18,7 @@ package org.terasology.blockNetwork;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3ic;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -79,7 +79,7 @@ public class EfficientBlockNetwork<T extends NetworkNode> {
      * @param location The location to query.
      * @return A collection of leaf nodes at <code>location</code>.
      */
-    public Collection<T> getLeafNodesAt(Vector3i location) {
+    public Collection<T> getLeafNodesAt(Vector3ic location) {
         return leafNodes.get(new ImmutableBlockLocation(location));
     }
 
@@ -89,7 +89,7 @@ public class EfficientBlockNetwork<T extends NetworkNode> {
      * @param location The location to query.
      * @return A collection of leaf nodes at <code>location</code>.
      */
-    public Collection<T> getNetworkingNodesAt(Vector3i location) {
+    public Collection<T> getNetworkingNodesAt(Vector3ic location) {
         return networkingNodes.get(new ImmutableBlockLocation(location));
     }
 
