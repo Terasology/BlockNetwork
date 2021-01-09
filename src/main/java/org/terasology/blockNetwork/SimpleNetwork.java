@@ -19,9 +19,9 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
+import org.joml.Vector3i;
 import org.terasology.math.Side;
 import org.terasology.math.SideBitFlag;
-import org.terasology.math.geom.Vector3i;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -350,7 +350,7 @@ public class SimpleNetwork<T extends NetworkNode> implements Network<T> {
             // Degenerated network
             for (Side connectingOnSide : SideBitFlag.getSides(networkNode.connectionSides)) {
                 Vector3i possibleLocation = networkNode.location.toVector3i();
-                possibleLocation.add(connectingOnSide.getVector3i());
+                possibleLocation.add(connectingOnSide.direction());
                 for (NetworkNode node : leafNodes.get(new ImmutableBlockLocation(possibleLocation))) {
                     if (SideBitFlag.hasSide(node.connectionSides, connectingOnSide.reverse())) {
                         return SideBitFlag.getSide(connectingOnSide);
@@ -363,7 +363,7 @@ public class SimpleNetwork<T extends NetworkNode> implements Network<T> {
             byte result = 0;
             for (Side connectingOnSide : SideBitFlag.getSides(networkNode.connectionSides)) {
                 Vector3i possibleLocation = networkNode.location.toVector3i();
-                possibleLocation.add(connectingOnSide.getVector3i());
+                possibleLocation.add(connectingOnSide.direction());
                 for (NetworkNode node : networkingNodes.get(new ImmutableBlockLocation(possibleLocation))) {
                     if (SideBitFlag.hasSide(node.connectionSides, connectingOnSide.reverse())) {
                         result += SideBitFlag.getSide(connectingOnSide);

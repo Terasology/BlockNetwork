@@ -15,11 +15,12 @@
  */
 package org.terasology.blockNetwork;
 
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.junit.Before;
 import org.junit.Test;
 import org.terasology.math.Side;
 import org.terasology.math.SideBitFlag;
-import org.terasology.math.geom.Vector3i;
 
 import java.util.List;
 
@@ -39,7 +40,7 @@ public class SimpleNetworkTest {
         upOnly = SideBitFlag.addSide((byte) 0, Side.TOP);
     }
 
-    private NetworkNode toNode(Vector3i location, byte sides) {
+    private NetworkNode toNode(Vector3ic location, byte sides) {
         return new NetworkNode(location, sides);
     }
 
