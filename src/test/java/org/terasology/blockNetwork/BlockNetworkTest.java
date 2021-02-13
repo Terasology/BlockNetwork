@@ -20,23 +20,24 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.terasology.math.Side;
 
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 
 public class BlockNetworkTest {
     private BlockNetwork<NetworkNode> blockNetwork;
     private TestListener listener;
     private byte allDirections;
 
-    @Before
+    @BeforeAll
     public void setup() {
         blockNetwork = new BlockNetwork();
         listener = new TestListener();
@@ -186,12 +187,9 @@ public class BlockNetworkTest {
     public void tryAddingOverlappingConnectionsNetworkingNodes() {
         Vector3i location = new Vector3i(0, 0, 0);
         blockNetwork.addNetworkingBlock(new NetworkNode(location, Side.RIGHT, Side.LEFT));
-        try {
+        assertThrows(IllegalStateException.class, () -> {
             blockNetwork.addNetworkingBlock(new NetworkNode(location, Side.FRONT, Side.BACK, Side.RIGHT));
-            fail("Expected IllegalStateException");
-        } catch (IllegalStateException exp) {
-            // expected
-        }
+        });
     }
 
     @Test

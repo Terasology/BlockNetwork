@@ -17,23 +17,23 @@ package org.terasology.blockNetwork;
 
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.terasology.math.Side;
 import org.terasology.math.SideBitFlag;
 
 import java.util.List;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 public class EfficientNetworkTest {
     private EfficientNetwork<NetworkNode> network;
     private byte allDirections;
     private byte upOnly;
 
-    @Before
+    @BeforeAll
     public void setup() {
         network = new EfficientNetwork<>();
         allDirections = 63;
