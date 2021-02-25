@@ -20,24 +20,24 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.math.Side;
 import org.terasology.math.SideBitFlag;
 
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EfficientBlockNetworkTest {
     private EfficientBlockNetwork<NetworkNode> blockNetwork;
     private TestListenerEfficient listener;
     private byte allDirections;
 
-    @Before
+    @BeforeEach
     public void setup() {
         blockNetwork = new EfficientBlockNetwork<>();
         listener = new TestListenerEfficient();
@@ -73,7 +73,8 @@ public class EfficientBlockNetworkTest {
         assertEquals(1, blockNetwork.getNetworks().size());
         listener.validateNumbers(1, 0, 0, 0, 0, 0);
 
-        blockNetwork.removeNetworkingBlock(toNode(new Vector3i(0, 0, 0), allDirections), NetworkChangeReason.WORLD_CHANGE);
+        blockNetwork.removeNetworkingBlock(toNode(new Vector3i(0, 0, 0), allDirections),
+                NetworkChangeReason.WORLD_CHANGE);
         assertEquals(0, blockNetwork.getNetworks().size());
         listener.validateNumbers(1, 1, 0, 0, 0, 0);
     }
@@ -150,11 +151,13 @@ public class EfficientBlockNetworkTest {
     public void removingNetworkingNodeSplitsNetworkInTwo() {
         blockNetwork.addNetworkingBlock(toNode(new Vector3i(0, 0, 1), allDirections), NetworkChangeReason.WORLD_CHANGE);
         blockNetwork.addNetworkingBlock(toNode(new Vector3i(0, 0, 0), allDirections), NetworkChangeReason.WORLD_CHANGE);
-        blockNetwork.addNetworkingBlock(toNode(new Vector3i(0, 0, -1), allDirections), NetworkChangeReason.WORLD_CHANGE);
+        blockNetwork.addNetworkingBlock(toNode(new Vector3i(0, 0, -1), allDirections),
+                NetworkChangeReason.WORLD_CHANGE);
         assertEquals(1, blockNetwork.getNetworks().size());
         listener.validateNumbers(1, 0, 2, 0, 0, 0);
 
-        blockNetwork.removeNetworkingBlock(toNode(new Vector3i(0, 0, 0), allDirections), NetworkChangeReason.WORLD_CHANGE);
+        blockNetwork.removeNetworkingBlock(toNode(new Vector3i(0, 0, 0), allDirections),
+                NetworkChangeReason.WORLD_CHANGE);
         assertEquals(2, blockNetwork.getNetworks().size());
         listener.validateNumbers(3, 1, 2, 0, 0, 0);
     }
@@ -162,7 +165,8 @@ public class EfficientBlockNetworkTest {
     @Test
     public void addingNetworkingNodeJoinsExistingNetworks() {
         blockNetwork.addNetworkingBlock(toNode(new Vector3i(0, 0, 1), allDirections), NetworkChangeReason.WORLD_CHANGE);
-        blockNetwork.addNetworkingBlock(toNode(new Vector3i(0, 0, -1), allDirections), NetworkChangeReason.WORLD_CHANGE);
+        blockNetwork.addNetworkingBlock(toNode(new Vector3i(0, 0, -1), allDirections),
+                NetworkChangeReason.WORLD_CHANGE);
         assertEquals(2, blockNetwork.getNetworks().size());
         listener.validateNumbers(2, 0, 0, 0, 0, 0);
 
@@ -195,8 +199,10 @@ public class EfficientBlockNetworkTest {
     @Test
     public void addTwoOverlappingCrossingNetworkingNodes() {
         Vector3i location = new Vector3i(0, 0, 0);
-        blockNetwork.addNetworkingBlock(new NetworkNode(location, Side.RIGHT, Side.LEFT), NetworkChangeReason.WORLD_CHANGE);
-        blockNetwork.addNetworkingBlock(new NetworkNode(location, Side.FRONT, Side.BACK), NetworkChangeReason.WORLD_CHANGE);
+        blockNetwork.addNetworkingBlock(new NetworkNode(location, Side.RIGHT, Side.LEFT),
+                NetworkChangeReason.WORLD_CHANGE);
+        blockNetwork.addNetworkingBlock(new NetworkNode(location, Side.FRONT, Side.BACK),
+                NetworkChangeReason.WORLD_CHANGE);
 
         assertEquals(2, blockNetwork.getNetworks().size());
     }
@@ -204,13 +210,13 @@ public class EfficientBlockNetworkTest {
     @Test
     public void tryAddingOverlappingConnectionsNetworkingNodes() {
         Vector3i location = new Vector3i(0, 0, 0);
-        blockNetwork.addNetworkingBlock(new NetworkNode(location, Side.RIGHT, Side.LEFT), NetworkChangeReason.WORLD_CHANGE);
-        try {
-            blockNetwork.addNetworkingBlock(new NetworkNode(location, Side.FRONT, Side.BACK, Side.RIGHT), NetworkChangeReason.WORLD_CHANGE);
-            fail("Expected IllegalArgumentException");
-        } catch (IllegalArgumentException exp) {
-            // expected
-        }
+        blockNetwork.addNetworkingBlock(new NetworkNode(location, Side.RIGHT, Side.LEFT),
+                NetworkChangeReason.WORLD_CHANGE);
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            blockNetwork.addNetworkingBlock(new NetworkNode(location, Side.FRONT, Side.BACK, Side.RIGHT),
+                    NetworkChangeReason.WORLD_CHANGE);
+        });
     }
 
     @Test
@@ -221,9 +227,12 @@ public class EfficientBlockNetworkTest {
         final NetworkNode frontBack = new NetworkNode(location, Side.FRONT, Side.BACK);
         blockNetwork.addNetworkingBlock(frontBack, NetworkChangeReason.WORLD_CHANGE);
 
-        blockNetwork.addNetworkingBlock(new NetworkNode(new Vector3i(0, 0, 1), allDirections), NetworkChangeReason.WORLD_CHANGE);
-        blockNetwork.addNetworkingBlock(new NetworkNode(new Vector3i(1, 0, 1), allDirections), NetworkChangeReason.WORLD_CHANGE);
-        blockNetwork.addNetworkingBlock(new NetworkNode(new Vector3i(1, 0, 0), allDirections), NetworkChangeReason.WORLD_CHANGE);
+        blockNetwork.addNetworkingBlock(new NetworkNode(new Vector3i(0, 0, 1), allDirections),
+                NetworkChangeReason.WORLD_CHANGE);
+        blockNetwork.addNetworkingBlock(new NetworkNode(new Vector3i(1, 0, 1), allDirections),
+                NetworkChangeReason.WORLD_CHANGE);
+        blockNetwork.addNetworkingBlock(new NetworkNode(new Vector3i(1, 0, 0), allDirections),
+                NetworkChangeReason.WORLD_CHANGE);
 
         assertEquals(1, blockNetwork.getNetworks().size());
 
@@ -233,8 +242,10 @@ public class EfficientBlockNetworkTest {
 
     @Test
     public void networkingNodesNotConnectingIfInputOutputConflict() {
-        blockNetwork.addNetworkingBlock(new NetworkNode(new Vector3i(0, 0, 0), allDirections, (byte) 0), NetworkChangeReason.WORLD_CHANGE);
-        blockNetwork.addNetworkingBlock(new NetworkNode(new Vector3i(0, 0, 1), allDirections, (byte) 0), NetworkChangeReason.WORLD_CHANGE);
+        blockNetwork.addNetworkingBlock(new NetworkNode(new Vector3i(0, 0, 0), allDirections, (byte) 0),
+                NetworkChangeReason.WORLD_CHANGE);
+        blockNetwork.addNetworkingBlock(new NetworkNode(new Vector3i(0, 0, 1), allDirections, (byte) 0),
+                NetworkChangeReason.WORLD_CHANGE);
 
         assertEquals(2, blockNetwork.getNetworks().size());
         listener.validateNumbers(2, 0, 0, 0, 0, 0);
@@ -242,8 +253,10 @@ public class EfficientBlockNetworkTest {
 
     @Test
     public void networkingNodesConnectingWithCorrectInputOutput() {
-        blockNetwork.addNetworkingBlock(new NetworkNode(new Vector3i(0, 0, 0), allDirections, (byte) 0), NetworkChangeReason.WORLD_CHANGE);
-        blockNetwork.addNetworkingBlock(new NetworkNode(new Vector3i(0, 0, 1), (byte) 0, allDirections), NetworkChangeReason.WORLD_CHANGE);
+        blockNetwork.addNetworkingBlock(new NetworkNode(new Vector3i(0, 0, 0), allDirections, (byte) 0),
+                NetworkChangeReason.WORLD_CHANGE);
+        blockNetwork.addNetworkingBlock(new NetworkNode(new Vector3i(0, 0, 1), (byte) 0, allDirections),
+                NetworkChangeReason.WORLD_CHANGE);
 
         assertEquals(1, blockNetwork.getNetworks().size());
         listener.validateNumbers(1, 0, 1, 0, 0, 0);
@@ -252,11 +265,14 @@ public class EfficientBlockNetworkTest {
     @Test
     public void networkingNodesDistanceWithInputOutput() {
         NetworkNode startBlock = new NetworkNode(new Vector3i(0, 0, 0), (byte) 0, allDirections);
-        NetworkNode endBlock = new NetworkNode(new Vector3i(0, 1, 0), SideBitFlag.getSide(Side.FRONT), SideBitFlag.getSides(Side.BACK, Side.LEFT, Side.RIGHT, Side.TOP, Side.BOTTOM));
+        NetworkNode endBlock = new NetworkNode(new Vector3i(0, 1, 0), SideBitFlag.getSide(Side.FRONT),
+                SideBitFlag.getSides(Side.BACK, Side.LEFT, Side.RIGHT, Side.TOP, Side.BOTTOM));
 
         blockNetwork.addNetworkingBlock(startBlock, NetworkChangeReason.WORLD_CHANGE);
-        blockNetwork.addNetworkingBlock(new NetworkNode(new Vector3i(0, 0, 1), allDirections, allDirections), NetworkChangeReason.WORLD_CHANGE);
-        blockNetwork.addNetworkingBlock(new NetworkNode(new Vector3i(0, 1, 1), allDirections, allDirections), NetworkChangeReason.WORLD_CHANGE);
+        blockNetwork.addNetworkingBlock(new NetworkNode(new Vector3i(0, 0, 1), allDirections, allDirections),
+                NetworkChangeReason.WORLD_CHANGE);
+        blockNetwork.addNetworkingBlock(new NetworkNode(new Vector3i(0, 1, 1), allDirections, allDirections),
+                NetworkChangeReason.WORLD_CHANGE);
         blockNetwork.addNetworkingBlock(endBlock, NetworkChangeReason.WORLD_CHANGE);
 
         assertEquals(1, blockNetwork.getNetworks().size());
@@ -292,45 +308,52 @@ public class EfficientBlockNetworkTest {
         }
 
         @Override
-        public void networkSplit(Network2<NetworkNode> oldNetwork, Set<? extends Network2<NetworkNode>> resultNetwork, NetworkChangeReason reason) {
+        public void networkSplit(Network2<NetworkNode> oldNetwork, Set<? extends Network2<NetworkNode>> resultNetwork
+                , NetworkChangeReason reason) {
             networksRemoved++;
             networksAdded += resultNetwork.size();
         }
 
         @Override
-        public void networksMerged(Set<? extends Network2<NetworkNode>> oldNetworks, Network2<NetworkNode> newNetwork, NetworkChangeReason reason) {
+        public void networksMerged(Set<? extends Network2<NetworkNode>> oldNetworks, Network2<NetworkNode> newNetwork
+                , NetworkChangeReason reason) {
             networksRemoved += oldNetworks.size();
             networksAdded++;
         }
 
         @Override
-        public void networkingNodesAdded(Network2<NetworkNode> network, Set<NetworkNode> networkingNodes, NetworkChangeReason reason) {
+        public void networkingNodesAdded(Network2<NetworkNode> network, Set<NetworkNode> networkingNodes,
+                                         NetworkChangeReason reason) {
             networkingNodesAdded++;
         }
 
         @Override
-        public void networkingNodesRemoved(Network2<NetworkNode> network, Set<NetworkNode> networkingNodes, NetworkChangeReason reason) {
+        public void networkingNodesRemoved(Network2<NetworkNode> network, Set<NetworkNode> networkingNodes,
+                                           NetworkChangeReason reason) {
             networkingNodesRemoved++;
         }
 
         @Override
-        public void leafNodesAdded(Network2<NetworkNode> network, Set<NetworkNode> leafNodes, NetworkChangeReason reason) {
+        public void leafNodesAdded(Network2<NetworkNode> network, Set<NetworkNode> leafNodes,
+                                   NetworkChangeReason reason) {
             leafNodesAdded++;
         }
 
         @Override
-        public void leafNodesRemoved(Network2<NetworkNode> network, Set<NetworkNode> leafNodes, NetworkChangeReason reason) {
+        public void leafNodesRemoved(Network2<NetworkNode> network, Set<NetworkNode> leafNodes,
+                                     NetworkChangeReason reason) {
             leafNodesRemoved++;
         }
 
-        public void validateNumbers(int networksAddedExpected, int networksRemovedExpected, int networkingNodesAddedExpected, int networkingNodesRemovedExpected,
+        public void validateNumbers(int networksAddedExpected, int networksRemovedExpected,
+                                    int networkingNodesAddedExpected, int networkingNodesRemovedExpected,
                                     int leafNodesAddedExpected, int leafNodesRemovedExpected) {
-            assertEquals("Networks added", networksAddedExpected, networksAdded);
-            assertEquals("Networks removed", networksRemovedExpected, networksRemoved);
-            assertEquals("Networking nodes added", networkingNodesAddedExpected, networkingNodesAdded);
-            assertEquals("Networking nodes removed", networkingNodesRemovedExpected, networkingNodesRemoved);
-            assertEquals("Leaf nodes added", leafNodesAddedExpected, leafNodesAdded);
-            assertEquals("Leaf nodes removed", leafNodesRemovedExpected, leafNodesRemoved);
+            assertEquals(networksAddedExpected, networksAdded, "Networks added");
+            assertEquals(networksRemovedExpected, networksRemoved, "Networks removed");
+            assertEquals(networkingNodesAddedExpected, networkingNodesAdded, "Networking nodes added");
+            assertEquals(networkingNodesRemovedExpected, networkingNodesRemoved, "Networking nodes removed");
+            assertEquals(leafNodesAddedExpected, leafNodesAdded, "Leaf nodes added");
+            assertEquals(leafNodesRemovedExpected, leafNodesRemoved, "Leaf nodes removed");
         }
     }
 
@@ -340,12 +363,14 @@ public class EfficientBlockNetworkTest {
         private Multimap<Network, NetworkNode> leafNodes = HashMultimap.create();
 
         @Override
-        public void networkSplit(Network2<NetworkNode> oldNetwork, Set<? extends Network2<NetworkNode>> resultNetwork, NetworkChangeReason reason) {
+        public void networkSplit(Network2<NetworkNode> oldNetwork, Set<? extends Network2<NetworkNode>> resultNetwork
+                , NetworkChangeReason reason) {
 
         }
 
         @Override
-        public void networksMerged(Set<? extends Network2<NetworkNode>> oldNetworks, Network2<NetworkNode> newNetwork, NetworkChangeReason reason) {
+        public void networksMerged(Set<? extends Network2<NetworkNode>> oldNetworks, Network2<NetworkNode> newNetwork
+                , NetworkChangeReason reason) {
 
         }
 
@@ -361,7 +386,8 @@ public class EfficientBlockNetworkTest {
         }
 
         @Override
-        public void networkingNodesAdded(Network2<NetworkNode> network, Set<NetworkNode> networkingNodesAdded, NetworkChangeReason reason) {
+        public void networkingNodesAdded(Network2<NetworkNode> network, Set<NetworkNode> networkingNodesAdded,
+                                         NetworkChangeReason reason) {
             assertTrue(networks.contains(network));
             for (NetworkNode networkingNode : networkingNodesAdded) {
                 assertTrue(this.networkingNodes.put(network, networkingNode));
@@ -369,7 +395,8 @@ public class EfficientBlockNetworkTest {
         }
 
         @Override
-        public void networkingNodesRemoved(Network2<NetworkNode> network, Set<NetworkNode> networkingNodesRemoved, NetworkChangeReason reason) {
+        public void networkingNodesRemoved(Network2<NetworkNode> network, Set<NetworkNode> networkingNodesRemoved,
+                                           NetworkChangeReason reason) {
             assertTrue(networks.contains(network));
             for (NetworkNode networkingNode : networkingNodesRemoved) {
                 assertTrue(this.networkingNodes.remove(network, networkingNode));
@@ -377,7 +404,8 @@ public class EfficientBlockNetworkTest {
         }
 
         @Override
-        public void leafNodesAdded(Network2<NetworkNode> network, Set<NetworkNode> leafNodesAdded, NetworkChangeReason reason) {
+        public void leafNodesAdded(Network2<NetworkNode> network, Set<NetworkNode> leafNodesAdded,
+                                   NetworkChangeReason reason) {
             assertTrue(networks.contains(network));
             for (NetworkNode leafNode : leafNodesAdded) {
                 assertTrue(this.leafNodes.put(network, leafNode));
@@ -385,7 +413,8 @@ public class EfficientBlockNetworkTest {
         }
 
         @Override
-        public void leafNodesRemoved(Network2<NetworkNode> network, Set<NetworkNode> leafNodesRemoved, NetworkChangeReason reason) {
+        public void leafNodesRemoved(Network2<NetworkNode> network, Set<NetworkNode> leafNodesRemoved,
+                                     NetworkChangeReason reason) {
             assertTrue(networks.contains(network));
             for (NetworkNode leafNode : leafNodesRemoved) {
                 assertTrue(this.leafNodes.remove(network, leafNode));
