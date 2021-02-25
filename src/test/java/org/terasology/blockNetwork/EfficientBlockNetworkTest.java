@@ -20,7 +20,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.terasology.math.Side;
 import org.terasology.math.SideBitFlag;
@@ -28,16 +28,16 @@ import org.terasology.math.SideBitFlag;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EfficientBlockNetworkTest {
     private EfficientBlockNetwork<NetworkNode> blockNetwork;
     private TestListenerEfficient listener;
     private byte allDirections;
 
-    @BeforeAll
+    @BeforeEach
     public void setup() {
         blockNetwork = new EfficientBlockNetwork<>();
         listener = new TestListenerEfficient();
