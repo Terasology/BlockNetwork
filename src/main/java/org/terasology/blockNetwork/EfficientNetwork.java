@@ -26,8 +26,8 @@ import org.joml.Vector3i;
 import org.terasology.blockNetwork.traversal.BreadthFirstTraversal;
 import org.terasology.blockNetwork.traversal.BreadthFirstTraversalWithPath;
 import org.terasology.blockNetwork.traversal.TraversalResult;
-import org.terasology.math.Side;
-import org.terasology.math.SideBitFlag;
+import org.terasology.engine.math.Side;
+import org.terasology.engine.math.SideBitFlag;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;

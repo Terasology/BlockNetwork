@@ -3,16 +3,16 @@
 package org.terasology.blockNetwork.block.family;
 
 import com.google.common.collect.Maps;
-import org.terasology.math.Rotation;
-import org.terasology.math.Side;
+import org.terasology.engine.math.Rotation;
+import org.terasology.engine.math.Side;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.block.BlockBuilderHelper;
+import org.terasology.engine.world.block.BlockUri;
+import org.terasology.engine.world.block.family.AbstractBlockFamily;
+import org.terasology.engine.world.block.family.BlockPlacementData;
+import org.terasology.engine.world.block.family.RegisterBlockFamily;
+import org.terasology.engine.world.block.loader.BlockFamilyDefinition;
 import org.terasology.naming.Name;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockBuilderHelper;
-import org.terasology.world.block.BlockUri;
-import org.terasology.world.block.family.AbstractBlockFamily;
-import org.terasology.world.block.family.BlockPlacementData;
-import org.terasology.world.block.family.RegisterBlockFamily;
-import org.terasology.world.block.loader.BlockFamilyDefinition;
 
 import java.util.Map;
 

@@ -15,7 +15,7 @@
  */
 package org.terasology.blockNetwork;
 
-import org.terasology.math.Side;
+import org.terasology.engine.math.Side;
 
 import java.util.Collection;
 import java.util.List;

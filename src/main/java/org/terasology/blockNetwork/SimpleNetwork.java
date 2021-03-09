@@ -20,8 +20,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 import org.joml.Vector3i;
-import org.terasology.math.Side;
-import org.terasology.math.SideBitFlag;
+import org.terasology.engine.math.Side;
+import org.terasology.engine.math.SideBitFlag;
 
 import java.util.Arrays;
 import java.util.Collection;

@@ -17,7 +17,7 @@ package org.terasology.blockNetwork;
 
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.math.Side;
+import org.terasology.engine.math.Side;
 
 /**
  * Contains a block location immutably.

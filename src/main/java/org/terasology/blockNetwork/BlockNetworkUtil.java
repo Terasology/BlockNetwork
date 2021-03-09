@@ -16,11 +16,11 @@
 package org.terasology.blockNetwork;
 
 import org.terasology.blockNetwork.block.family.RotationBlockFamily;
-import org.terasology.math.Rotation;
-import org.terasology.math.Side;
-import org.terasology.math.SideBitFlag;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.family.BlockFamily;
+import org.terasology.engine.math.Rotation;
+import org.terasology.engine.math.Side;
+import org.terasology.engine.math.SideBitFlag;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.block.family.BlockFamily;
 
 public final class BlockNetworkUtil {
     private BlockNetworkUtil() {

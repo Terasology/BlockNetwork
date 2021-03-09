@@ -15,9 +15,8 @@
  */
 package org.terasology.blockNetwork.block.family;
 
-import org.terasology.math.Rotation;
-import org.terasology.math.Side;
-import org.terasology.world.block.Block;
+import org.terasology.engine.math.Rotation;
+import org.terasology.engine.world.block.Block;
 
 /**
  * Block family interface that defined its blocks by rotation.

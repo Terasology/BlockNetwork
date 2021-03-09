@@ -16,8 +16,8 @@
 package org.terasology.blockNetwork;
 
 import org.joml.Vector3ic;
-import org.terasology.math.Side;
-import org.terasology.math.SideBitFlag;
+import org.terasology.engine.math.Side;
+import org.terasology.engine.math.SideBitFlag;
 
 /**
  * Represents a single node in a block network.
