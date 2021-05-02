@@ -12,7 +12,7 @@ import org.terasology.engine.world.block.family.AbstractBlockFamily;
 import org.terasology.engine.world.block.family.BlockPlacementData;
 import org.terasology.engine.world.block.family.RegisterBlockFamily;
 import org.terasology.engine.world.block.loader.BlockFamilyDefinition;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.naming.Name;
 
 import java.util.Map;
 
